@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python input() Magic Deck 🪄</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts: Fredoka & Fira Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700;900&family=Fira+Code:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #1E1B4B 0%, #2E1065 100%);
+            color: #FFFFFF;
+            min-height: 100vh;
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Bouncy Interactions */
+        .bounce-btn {
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s;
+        }
+        .bounce-btn:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 10px 20px -5px rgba(250, 204, 21, 0.4);
+        }
+        .bounce-btn:active {
+            transform: translateY(1px) scale(0.97);
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(250, 204, 21, 0.4); }
+            50% { box-shadow: 0 0 35px rgba(250, 204, 21, 0.9); }
+        }
+        .glow-yellow {
+            animation: pulseGlow 2s infinite;
+        }
+
+        .slide-container {
+            display: none;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .slide-container.active {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card-dark {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(14px);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .terminal-box {
+            background-color: #0F172A;
+            border: 2px solid #334155;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.7);
+        }
+
+        /* Speech bubble arrow */
+        .bubble-arrow::before {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: 20px;
+            border-width: 8px 12px 8px 0;
+            border-style: solid;
+            border-color: transparent #FFFFFF transparent transparent;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen justify-between p-3 md:p-6 overflow-y-auto">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="w-full max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 rounded-2xl card-dark z-20 mb-3">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="goToSlide(0)">
+            <span class="text-3xl">🤖</span>
+            <div>
+                <h1 class="text-xl md:text-2xl font-black text-yellow-400 leading-none">Python input()</h1>
+                <p class="text-xs text-purple-200">Interactive Visual Guide</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+            <!-- Slide Selector -->
+            <select id="slideSelect" onchange="goToSlide(parseInt(this.value))" class="bg-purple-950 text-yellow-300 font-bold px-3 py-1.5 rounded-xl border border-yellow-400/40 text-xs sm:text-sm cursor-pointer outline-none">
+                <!-- Populated via JS -->
+            </select>
+
+            <!-- Slide Indicator -->
+            <span id="slideIndicator" class="bg-yellow-400 text-purple-950 px-3.5 py-1 rounded-full font-black text-xs sm:text-sm shadow-md whitespace-nowrap">
+                1 / 11
+            </span>
+        </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="w-full max-w-6xl mx-auto bg-purple-950 rounded-full h-2.5 mb-4 overflow-hidden border border-purple-800">
+        <div id="deckProgressBar" class="bg-gradient-to-r from-yellow-400 to-green-400 h-full w-1/11 transition-all duration-300"></div>
+    </div>
+
+    <!-- MAIN SLIDE AREA -->
+    <main class="w-full max-w-6xl mx-auto flex-grow flex items-center justify-center my-auto min-h-[500px]">
+
+        <!-- SLIDE 1: TITLE -->
+        <section id="slide-0" class="slide-container active flex-col items-center justify-center text-center p-6 md:p-12 rounded-3xl card-dark w-full h-full relative">
+            <span class="text-8xl md:text-9xl mb-4 block animate-bounce">🤖</span>
+            
+            <h2 class="text-4xl md:text-7xl font-black text-yellow-400 mb-3 tracking-tight">
+                Python <code class="code-font text-white bg-purple-950 px-3 py-1 rounded-2xl border-2 border-yellow-400">input()</code>
+            </h2>
+            
+            <p class="text-xl md:text-3xl text-purple-100 font-bold max-w-lg mb-8">
+                Make your code LISTEN to you! 🎧
+            </p>
+
+            <button onclick="nextSlide()" class="bounce-btn glow-yellow bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black text-2xl px-10 py-4 rounded-2xl shadow-2xl flex items-center gap-3">
+                <span>Start</span>
+                <span class="text-3xl">🚀</span>
+            </button>
+        </section>
+
+        <!-- SLIDE 2: HOOK & REAL-LIFE ANALOGY -->
+        <section id="slide-1" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-4xl">🍦</span>
+                <h2 class="text-2xl md:text-4xl font-black text-yellow-400">The Ice Cream Shop</h2>
+            </div>
+            
+            <p class="text-lg md:text-xl text-purple-100 font-bold mb-6">
+                The chef asks: <span class="text-yellow-300">"What flavor?"</span> What happens next?
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="quiz-s2">
+                <button onclick="checkQuizS2(this, false)" class="bounce-btn bg-purple-900/60 p-5 rounded-2xl border-2 border-purple-700 hover:border-yellow-400 text-left flex items-center gap-4">
+                    <span class="text-4xl">🙈</span>
+                    <span class="font-bold text-base md:text-lg">Chef guesses randomly</span>
+                </button>
+                <button onclick="checkQuizS2(this, false)" class="bounce-btn bg-purple-900/60 p-5 rounded-2xl border-2 border-purple-700 hover:border-yellow-400 text-left flex items-center gap-4">
+                    <span class="text-4xl">🏃‍♂️</span>
+                    <span class="font-bold text-base md:text-lg">Chef runs away</span>
+                </button>
+                <button onclick="checkQuizS2(this, true)" class="bounce-btn bg-purple-900/60 p-5 rounded-2xl border-2 border-purple-700 hover:border-yellow-400 text-left flex items-center gap-4">
+                    <span class="text-4xl">⏳</span>
+                    <span class="font-bold text-base md:text-lg text-yellow-300">Chef PAUSES and WAITS for you!</span>
+                </button>
+                <button onclick="checkQuizS2(this, false)" class="bounce-btn bg-purple-900/60 p-5 rounded-2xl border-2 border-purple-700 hover:border-yellow-400 text-left flex items-center gap-4">
+                    <span class="text-4xl">💥</span>
+                    <span class="font-bold text-base md:text-lg">The shop closes</span>
+                </button>
+            </div>
+
+            <div id="quiz-s2-feedback" class="hidden mt-6 p-4 rounded-2xl bg-green-500/20 border-2 border-green-400 text-green-300 font-bold text-lg text-center">
+                🎯 Exactly! <code class="code-font bg-purple-950 px-2 py-0.5 rounded text-yellow-300">input()</code> pauses Python and waits for your answer!
+            </div>
+        </section>
+
+        <!-- SLIDE 3: INTERACTIVE SIMULATOR -->
+        <section id="slide-2" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-4xl">🎧</span>
+                <h2 class="text-2xl md:text-4xl font-black text-yellow-400">Robo Ear Simulator</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center mb-4">
+                <!-- Controls -->
+                <div class="bg-purple-950/90 p-5 rounded-2xl border-2 border-yellow-400/40 flex flex-col gap-3">
+                    <div class="code-font text-xs sm:text-sm bg-slate-900 p-3 rounded-xl border border-slate-700 text-purple-300">
+                        food = <span class="text-green-400">input</span>(<span class="text-amber-300">"Favorite snack? "</span>)
+                    </div>
+                    <input type="text" id="roboInput" placeholder="Type a food (e.g. Pizza 🍕)" class="bg-purple-900 text-white font-bold px-4 py-3 rounded-xl border-2 border-yellow-400 outline-none text-base" />
+                    <button onclick="runRoboSim()" class="bounce-btn bg-yellow-400 text-purple-950 font-black py-3 rounded-xl text-lg flex items-center justify-center gap-2">
+                        <span>Send to Python ➡️</span>
+                    </button>
+                </div>
+
+                <!-- Display -->
+                <div class="bg-purple-900/40 p-6 rounded-2xl border-2 border-purple-700 flex items-center justify-center min-h-[180px] gap-4 relative">
+                    <div id="roboAvatar" class="text-7xl transition-transform">🤖</div>
+                    <div id="roboSpeechBubble" class="relative bubble-arrow bg-white text-purple-950 font-extrabold p-4 rounded-2xl text-base shadow-xl max-w-[200px]">
+                        "I am listening..."
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-yellow-400/10 border-2 border-yellow-400/80 p-3.5 rounded-2xl flex items-center gap-3 text-yellow-300 font-bold text-sm md:text-base">
+                <span class="text-2xl">💡</span>
+                <span>NOTICE: <code class="code-font bg-purple-950 px-2 py-0.5 rounded text-white">input()</code> freezes code execution until you press Enter!</span>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: CONCEPT FLOW VISUAL -->
+        <section id="slide-3" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-4xl">🔄</span>
+                <h2 class="text-2xl md:text-4xl font-black text-yellow-400">How Data Moves</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <!-- Step 1 -->
+                <div onclick="revealStep(1)" class="bounce-btn bg-purple-900/60 p-5 rounded-2xl border-2 border-purple-600 cursor-pointer text-center" id="stepCard1">
+                    <span class="text-5xl mb-2 block">💬</span>
+                    <h3 class="font-black text-yellow-300 text-lg">1. Prompt</h3>
+                    <p class="text-xs text-purple-200 mt-1">Question on screen</p>
+                    <div class="mt-3 text-xs code-font bg-purple-950 p-2 rounded text-green-300 hidden" id="stepDetail1">
+                        input("Name? ")
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div onclick="revealStep(2)" class="bounce-btn bg-purple-900/60 p-5 rounded-2xl border-2 border-purple-600 cursor-pointer text-center" id="stepCard2">
+                    <span class="text-5xl mb-2 block">⌨️</span>
+                    <h3 class="font-black text-yellow-300 text-lg">2. User Types</h3>
+                    <p class="text-xs text-purple-200 mt-1">Answer via keyboard</p>
+                    <div class="mt-3 text-xs code-font bg-purple-950 p-2 rounded text-amber-300 hidden" id="stepDetail2">
+                        "Alex"
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div onclick="revealStep(3)" class="bounce-btn bg-purple-900/60 p-5 rounded-2xl border-2 border-purple-600 cursor-pointer text-center" id="stepCard3">
+                    <span class="text-5xl mb-2 block">📦</span>
+                    <h3 class="font-black text-yellow-300 text-lg">3. Variable Box</h3>
+                    <p class="text-xs text-purple-200 mt-1">Saved inside box</p>
+                    <div class="mt-3 text-xs code-font bg-purple-950 p-2 rounded text-cyan-300 hidden" id="stepDetail3">
+                        name = "Alex"
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-purple-950 p-4 rounded-2xl border border-purple-700 text-center">
+                <span class="code-font text-yellow-300 font-bold text-base md:text-lg">box_name = input("Question")</span>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: CONCEPT SORTING -->
+        <section id="slide-4" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-4xl">🎯</span>
+                    <h2 class="text-2xl md:text-4xl font-black text-yellow-400">Input or Output?</h2>
+                </div>
+                <span id="sortProgressText" class="text-sm font-bold bg-purple-950 text-yellow-300 px-3 py-1 rounded-full border border-purple-700">0 / 4</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="classifierGrid">
+                <div class="bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 flex flex-col justify-between" id="item-c1">
+                    <span class="font-bold text-base mb-3">⌨️ Typing your name</span>
+                    <div class="flex gap-2">
+                        <button onclick="classifyItem('c1', 'input', true)" class="flex-1 bg-purple-800 hover:bg-yellow-400 hover:text-purple-950 py-2 rounded-xl font-bold text-xs">Input 📥</button>
+                        <button onclick="classifyItem('c1', 'output', false)" class="flex-1 bg-purple-800 hover:bg-yellow-400 hover:text-purple-950 py-2 rounded-xl font-bold text-xs">Output 📤</button>
+                    </div>
+                </div>
+
+                <div class="bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 flex flex-col justify-between" id="item-c2">
+                    <span class="font-bold text-base mb-3">🖥️ High score printed</span>
+                    <div class="flex gap-2">
+                        <button onclick="classifyItem('c2', 'input', false)" class="flex-1 bg-purple-800 hover:bg-yellow-400 hover:text-purple-950 py-2 rounded-xl font-bold text-xs">Input 📥</button>
+                        <button onclick="classifyItem('c2', 'output', true)" class="flex-1 bg-purple-800 hover:bg-yellow-400 hover:text-purple-950 py-2 rounded-xl font-bold text-xs">Output 📤</button>
+                    </div>
+                </div>
+
+                <div class="bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 flex flex-col justify-between" id="item-c3">
+                    <span class="font-bold text-base mb-3">🎤 Mic voice command</span>
+                    <div class="flex gap-2">
+                        <button onclick="classifyItem('c3', 'input', true)" class="flex-1 bg-purple-800 hover:bg-yellow-400 hover:text-purple-950 py-2 rounded-xl font-bold text-xs">Input 📥</button>
+                        <button onclick="classifyItem('c3', 'output', false)" class="flex-1 bg-purple-800 hover:bg-yellow-400 hover:text-purple-950 py-2 rounded-xl font-bold text-xs">Output 📤</button>
+                    </div>
+                </div>
+
+                <div class="bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 flex flex-col justify-between" id="item-c4">
+                    <span class="font-bold text-base mb-3">🔊 Speaker music</span>
+                    <div class="flex gap-2">
+                        <button onclick="classifyItem('c4', 'input', false)" class="flex-1 bg-purple-800 hover:bg-yellow-400 hover:text-purple-950 py-2 rounded-xl font-bold text-xs">Input 📥</button>
+                        <button onclick="classifyItem('c4', 'output', true)" class="flex-1 bg-purple-800 hover:bg-yellow-400 hover:text-purple-950 py-2 rounded-xl font-bold text-xs">Output 📤</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: THE STRING TRAP -->
+        <section id="slide-5" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-4xl">🪤</span>
+                <h2 class="text-2xl md:text-4xl font-black text-yellow-400">The Text Trap!</h2>
+            </div>
+
+            <p class="text-base md:text-lg text-purple-100 font-bold mb-4">
+                <code class="code-font bg-purple-950 px-2 py-0.5 rounded text-yellow-300">input()</code> turns ALL numbers into TEXT!
+            </p>
+
+            <div class="bg-purple-950 p-5 rounded-2xl border-2 border-purple-700 mb-4">
+                <div class="flex gap-3 mb-4">
+                    <button id="modeNormalBtn" onclick="setCalcMode('normal')" class="flex-1 bg-yellow-400 text-purple-950 font-black py-2.5 rounded-xl text-xs sm:text-sm">
+                        Raw input()
+                    </button>
+                    <button id="modeIntBtn" onclick="setCalcMode('int')" class="flex-1 bg-purple-800 text-purple-200 font-black py-2.5 rounded-xl text-xs sm:text-sm">
+                        int(input())
+                    </button>
+                </div>
+
+                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 text-center">
+                    <div class="text-xs text-purple-300 mb-2 font-bold">5 + 5 Result:</div>
+                    <div id="calcResultDisplay" class="text-4xl md:text-5xl font-black text-red-400 code-font">
+                        "5" + "5" = "55" ❌
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-green-500/10 border-2 border-green-400 p-3.5 rounded-2xl flex items-center gap-3 text-green-300 font-bold text-sm">
+                <span class="text-3xl">✨</span>
+                <span>FIX: Wrap with <code class="code-font text-yellow-300 bg-purple-950 px-2 py-0.5 rounded">int(input(...))</code> for REAL math!</span>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: SYNTAX RULES -->
+        <section id="slide-6" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-4xl">📜</span>
+                <h2 class="text-2xl md:text-4xl font-black text-yellow-400">Golden Rules</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Rule 1 -->
+                <div class="bg-purple-900/60 p-4 rounded-2xl border-2 border-green-400">
+                    <div class="flex items-center gap-2 text-green-400 font-bold mb-2">
+                        <span>✅ CORRECT</span>
+                    </div>
+                    <div class="code-font text-xs bg-slate-900 p-3 rounded-xl text-yellow-300 mb-2">
+                        name = input("Name? ")
+                    </div>
+                    <p class="text-xs text-purple-200">Variable box is on the LEFT of <code class="code-font text-white">=</code></p>
+                </div>
+
+                <!-- Rule 2 -->
+                <div class="bg-purple-900/60 p-4 rounded-2xl border-2 border-red-400">
+                    <div class="flex items-center gap-2 text-red-400 font-bold mb-2">
+                        <span>❌ WRONG</span>
+                    </div>
+                    <div class="code-font text-xs bg-slate-900 p-3 rounded-xl text-red-300 mb-2">
+                        input("Name? ") = name
+                    </div>
+                    <p class="text-xs text-purple-200">Never put <code class="code-font text-white">input()</code> on the left!</p>
+                </div>
+
+                <!-- Rule 3 -->
+                <div class="bg-purple-900/60 p-4 rounded-2xl border-2 border-green-400">
+                    <div class="flex items-center gap-2 text-green-400 font-bold mb-2">
+                        <span>✅ CORRECT</span>
+                    </div>
+                    <div class="code-font text-xs bg-slate-900 p-3 rounded-xl text-yellow-300 mb-2">
+                        age = int(input("Age? "))
+                    </div>
+                    <p class="text-xs text-purple-200">Quote marks inside <code class="code-font text-white">""</code> prompt!</p>
+                </div>
+
+                <!-- Rule 4 -->
+                <div class="bg-purple-900/60 p-4 rounded-2xl border-2 border-red-400">
+                    <div class="flex items-center gap-2 text-red-400 font-bold mb-2">
+                        <span>❌ WRONG</span>
+                    </div>
+                    <div class="code-font text-xs bg-slate-900 p-3 rounded-xl text-red-300 mb-2">
+                        age = input(Age?)
+                    </div>
+                    <p class="text-xs text-purple-200">Missing quotation marks gives a syntax error!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: DETECTIVE BUG HUNT -->
+        <section id="slide-7" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-4xl">🕵️‍♂️</span>
+                    <h2 class="text-2xl md:text-4xl font-black text-yellow-400">Bug Hunt!</h2>
+                </div>
+                <span id="bugCounter" class="text-xs font-black bg-yellow-400 text-purple-950 px-3 py-1 rounded-full">
+                    Find 2 Valid Lines
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="bugGrid">
+                <!-- Option 1 -->
+                <button onclick="checkBugChoice(this, true)" class="bounce-btn bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 code-font text-xs sm:text-sm text-left flex flex-col justify-between min-h-[90px]">
+                    <div class="text-yellow-300 font-sans font-bold text-xs border-b border-purple-700 pb-1"># Option 1:</div>
+                    <div class="text-white">age = input("Age? ")</div>
+                    <div class="text-right text-xs mt-1"><span class="status-icon">❓</span></div>
+                </button>
+
+                <!-- Option 2 -->
+                <button onclick="checkBugChoice(this, false, 'Missing quotes around text!')" class="bounce-btn bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 code-font text-xs sm:text-sm text-left flex flex-col justify-between min-h-[90px]">
+                    <div class="text-yellow-300 font-sans font-bold text-xs border-b border-purple-700 pb-1"># Option 2:</div>
+                    <div class="text-white">color = input(Color?)</div>
+                    <div class="text-right text-xs mt-1"><span class="status-icon">❓</span></div>
+                </button>
+
+                <!-- Option 3 -->
+                <button onclick="checkBugChoice(this, false, 'No variable name on left to hold input!')" class="bounce-btn bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 code-font text-xs sm:text-sm text-left flex flex-col justify-between min-h-[90px]">
+                    <div class="text-yellow-300 font-sans font-bold text-xs border-b border-purple-700 pb-1"># Option 3:</div>
+                    <div class="text-white">input("Password? ")</div>
+                    <div class="text-right text-xs mt-1"><span class="status-icon">❓</span></div>
+                </button>
+
+                <!-- Option 4 -->
+                <button onclick="checkBugChoice(this, true)" class="bounce-btn bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 code-font text-xs sm:text-sm text-left flex flex-col justify-between min-h-[90px]">
+                    <div class="text-yellow-300 font-sans font-bold text-xs border-b border-purple-700 pb-1"># Option 4:</div>
+                    <div class="text-white">pts = int(input("Pts? "))</div>
+                    <div class="text-right text-xs mt-1"><span class="status-icon">❓</span></div>
+                </button>
+            </div>
+
+            <div id="bugFeedbackBox" class="mt-4 p-3.5 rounded-2xl hidden text-center font-bold text-sm"></div>
+        </section>
+
+        <!-- SLIDE 9: SCENARIO QUIZ -->
+        <section id="slide-8" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-4xl">🧩</span>
+                <h2 class="text-2xl md:text-4xl font-black text-yellow-400">Scenario Quiz</h2>
+            </div>
+
+            <p class="text-base md:text-lg font-bold text-purple-100 mb-4">
+                Goal: Get user age as a number and add 1.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4" id="scenarioOptions">
+                <!-- Option 1 -->
+                <button onclick="checkScenario(this, false)" class="bounce-btn bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 text-left code-font text-xs sm:text-sm flex flex-col justify-between gap-2 min-h-[90px]">
+                    <div class="text-purple-300 font-sans font-bold text-xs border-b border-purple-700 pb-1">Option A:</div>
+                    <div class="text-white leading-relaxed">
+                        <span class="text-yellow-300">age = input("Age? ")</span><br>
+                        <span class="text-green-300">print(age + 1)</span>
+                    </div>
+                </button>
+
+                <!-- Option 2 (Correct) -->
+                <button onclick="checkScenario(this, true)" class="bounce-btn bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 text-left code-font text-xs sm:text-sm flex flex-col justify-between gap-2 min-h-[90px]">
+                    <div class="text-purple-300 font-sans font-bold text-xs border-b border-purple-700 pb-1">Option B:</div>
+                    <div class="text-white leading-relaxed">
+                        <span class="text-yellow-300">age = int(input("Age? "))</span><br>
+                        <span class="text-green-300">print(age + 1)</span>
+                    </div>
+                </button>
+
+                <!-- Option 3 -->
+                <button onclick="checkScenario(this, false)" class="bounce-btn bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 text-left code-font text-xs sm:text-sm flex flex-col justify-between gap-2 min-h-[90px]">
+                    <div class="text-purple-300 font-sans font-bold text-xs border-b border-purple-700 pb-1">Option C:</div>
+                    <div class="text-white leading-relaxed">
+                        <span class="text-yellow-300">age = inpt("Age? ")</span><br>
+                        <span class="text-green-300">print(age + 1)</span>
+                    </div>
+                </button>
+
+                <!-- Option 4 -->
+                <button onclick="checkScenario(this, false)" class="bounce-btn bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 text-left code-font text-xs sm:text-sm flex flex-col justify-between gap-2 min-h-[90px]">
+                    <div class="text-purple-300 font-sans font-bold text-xs border-b border-purple-700 pb-1">Option D:</div>
+                    <div class="text-white leading-relaxed">
+                        <span class="text-yellow-300">age = print("Age? ")</span><br>
+                        <span class="text-green-300">print(age + 1)</span>
+                    </div>
+                </button>
+            </div>
+
+            <div id="scenarioFeedback" class="hidden p-3.5 rounded-2xl text-center font-bold text-sm"></div>
+        </section>
+
+        <!-- SLIDE 10: CODE BUILDER & TERMINAL -->
+        <section id="slide-9" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
+            <div class="flex items-center gap-3 mb-3">
+                <span class="text-4xl">💻</span>
+                <h2 class="text-2xl md:text-4xl font-black text-yellow-400">Code Builder</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+                <!-- Left Builder -->
+                <div class="flex flex-col gap-3">
+                    <span class="text-xs font-bold text-yellow-300">1. Click Blocks to add to line:</span>
+                    <div class="flex flex-wrap gap-2" id="blockPalette">
+                        <button onclick="addBlockChip('name')" class="bounce-btn bg-purple-800 text-yellow-300 code-font text-xs px-3 py-2 rounded-lg border border-purple-600 font-bold">name</button>
+                        <button onclick="addBlockChip(' = ')" class="bounce-btn bg-purple-800 text-white code-font text-xs px-3 py-2 rounded-lg border border-purple-600 font-bold">=</button>
+                        <button onclick="addBlockChip('input(')" class="bounce-btn bg-purple-800 text-green-300 code-font text-xs px-3 py-2 rounded-lg border border-purple-600 font-bold">input(</button>
+                        <button onclick="addBlockChip('&quot;Hero Name? &quot;')" class="bounce-btn bg-purple-800 text-amber-300 code-font text-xs px-3 py-2 rounded-lg border border-purple-600 font-bold">"Hero Name? "</button>
+                        <button onclick="addBlockChip(')')" class="bounce-btn bg-purple-800 text-white code-font text-xs px-3 py-2 rounded-lg border border-purple-600 font-bold">)</button>
+                        <button onclick="addBlockChip('print(&quot;Hi &quot; + name)')" class="bounce-btn bg-purple-800 text-cyan-300 code-font text-xs px-3 py-2 rounded-lg border border-purple-600 font-bold w-full text-left">print("Hi " + name)</button>
+                    </div>
+
+                    <span class="text-xs font-bold text-yellow-300">2. Code Workspace:</span>
+                    <div class="code-font text-xs bg-slate-900 border-2 border-yellow-400/50 p-3 rounded-xl min-h-[90px] flex flex-wrap items-center gap-1.5 shadow-inner" id="editorDropzone">
+                        <span class="text-slate-500 italic" id="emptyEditorMsg">Tap blocks above to construct code...</span>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="runBuiltCode()" class="bounce-btn flex-1 bg-green-400 text-purple-950 font-black py-2.5 rounded-xl text-sm flex items-center justify-center gap-2">
+                            <span>▶ Run Code</span>
+                        </button>
+                        <button onclick="clearEditor()" class="bounce-btn bg-purple-950 text-red-400 font-bold px-4 py-2.5 rounded-xl text-xs border border-red-500/30">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Terminal -->
+                <div class="terminal-box rounded-xl p-3 flex flex-col font-mono text-xs min-h-[220px]">
+                    <div class="flex items-center gap-1.5 pb-2 border-b border-slate-700 mb-2">
+                        <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                        <span class="text-[10px] text-slate-400 ml-auto">Python Terminal</span>
+                    </div>
+
+                    <div id="terminalScreen" class="flex-grow overflow-y-auto space-y-2 code-font p-1">
+                        <div class="text-slate-500">Press 'Run Code' to execute.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 11: CODING CHALLENGE & PREP -->
+        <section id="slide-10" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full text-center items-center justify-center">
+            <h2 class="text-4xl md:text-6xl font-black text-yellow-400 mb-4">
+                Coding Challenge 🚀
+            </h2>
+
+            <div class="bg-purple-950 p-5 rounded-2xl border-2 border-purple-700 max-w-xl w-full text-left mb-6 space-y-4">
+                <!-- Q1 -->
+                <div>
+                    <p class="text-xs font-bold text-purple-200 mb-2">1. Get hero name from user:</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="prepQ1Group">
+                        <button onclick="answerPrep(1, true, this)" class="bounce-btn bg-purple-900 p-3 rounded-xl text-xs code-font text-purple-100 text-left border border-purple-700 flex flex-col gap-1">
+                            <span class="text-yellow-300 font-bold font-sans">Option A:</span>
+                            <span>hero = input("Name? ")</span>
+                        </button>
+                        <button onclick="answerPrep(1, false, this)" class="bounce-btn bg-purple-900 p-3 rounded-xl text-xs code-font text-purple-100 text-left border border-purple-700 flex flex-col gap-1">
+                            <span class="text-yellow-300 font-bold font-sans">Option B:</span>
+                            <span>hero = print("Name? ")</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Q2 -->
+                <div>
+                    <p class="text-xs font-bold text-purple-200 mb-2">2. Get power level as integer:</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="prepQ2Group">
+                        <button onclick="answerPrep(2, false, this)" class="bounce-btn bg-purple-900 p-3 rounded-xl text-xs code-font text-purple-100 text-left border border-purple-700 flex flex-col gap-1">
+                            <span class="text-yellow-300 font-bold font-sans">Option A:</span>
+                            <span>power = input("Power? ")</span>
+                        </button>
+                        <button onclick="answerPrep(2, true, this)" class="bounce-btn bg-purple-900 p-3 rounded-xl text-xs code-font text-purple-100 text-left border border-purple-700 flex flex-col gap-1">
+                            <span class="text-yellow-300 font-bold font-sans">Option B:</span>
+                            <span>power = int(input("Power? "))</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Victory Banner -->
+            <div id="finalBanner" class="hidden bg-gradient-to-r from-green-400 to-emerald-500 text-purple-950 p-5 rounded-2xl font-black text-xl md:text-2xl shadow-2xl border-2 border-white animate-bounce">
+                You are completely ready to write your first code! 🚀✨
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER NAVIGATION -->
+    <footer class="w-full max-w-6xl mx-auto flex items-center justify-between gap-4 p-3.5 rounded-2xl card-dark z-20 mt-3">
+        <button id="prevBtn" onclick="prevSlide()" class="bounce-btn bg-purple-900 hover:bg-purple-800 text-yellow-300 font-bold px-5 py-2.5 rounded-xl border border-purple-700 flex items-center gap-2 text-sm disabled:opacity-40">
+            <span>⬅️ Back</span>
+        </button>
+
+        <button id="nextBtn" onclick="nextSlide()" class="bounce-btn bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black px-7 py-2.5 rounded-xl shadow-lg flex items-center gap-2 text-sm disabled:opacity-40">
+            <span>Next ➡️</span>
+        </button>
+    </footer>
+
+    <script>
+        /* WEB AUDIO SYNTHESIZER */
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioContext();
+        }
+
+        function playClickSound() {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(450, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(850, audioCtx.currentTime + 0.06);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.06);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.06);
+            } catch(e){}
+        }
+
+        function playCorrectSound() {
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.18, now + idx * 0.07);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.18);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + idx * 0.07);
+                    osc.stop(now + idx * 0.07 + 0.18);
+                });
+            } catch(e){}
+        }
+
+        function playWrongSound() {
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.2);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } catch(e){}
+        }
+
+        /* SLIDE CONTROLLER */
+        const totalSlides = 11;
+        let currentSlide = 0;
+
+        const slideTitles = [
+            "1. Start", "2. Ice Cream Shop", "3. Robo Ear",
+            "4. Data Flow", "5. Input/Output", "6. Text Trap",
+            "7. Syntax Rules", "8. Bug Hunt", "9. Quiz",
+            "10. Code Builder", "11. Final Challenge"
+        ];
+
+        function initDropdown() {
+            const select = document.getElementById('slideSelect');
+            select.innerHTML = '';
+            slideTitles.forEach((title, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.innerText = title;
+                select.appendChild(opt);
+            });
+        }
+
+        function updateDeckUI() {
+            for (let i = 0; i < totalSlides; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                if (slide) slide.classList.remove('active');
+            }
+
+            const activeSlide = document.getElementById(`slide-${currentSlide}`);
+            if (activeSlide) activeSlide.classList.add('active');
+
+            document.getElementById('slideIndicator').innerText = `${currentSlide + 1} / ${totalSlides}`;
+            document.getElementById('slideSelect').value = currentSlide;
+
+            const progressPct = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('deckProgressBar').style.width = `${progressPct}%`;
+
+            document.getElementById('prevBtn').disabled = (currentSlide === 0);
+            document.getElementById('nextBtn').disabled = (currentSlide === totalSlides - 1);
+        }
+
+        function goToSlide(index) {
+            if (index >= 0 && index < totalSlides) {
+                currentSlide = index;
+                playClickSound();
+                updateDeckUI();
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) goToSlide(currentSlide - 1);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        /* SLIDE INTERACTION LOGIC */
+        function checkQuizS2(btn, isCorrect) {
+            const buttons = document.querySelectorAll('#quiz-s2 button');
+            buttons.forEach(b => b.classList.remove('border-green-400', 'border-red-400', 'bg-green-500/20', 'bg-red-500/20'));
+
+            if (isCorrect) {
+                playCorrectSound();
+                btn.classList.add('border-green-400', 'bg-green-500/20');
+                document.getElementById('quiz-s2-feedback').classList.remove('hidden');
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+            } else {
+                playWrongSound();
+                btn.classList.add('border-red-400', 'bg-red-500/20');
+            }
+        }
+
+        function runRoboSim() {
+            const text = document.getElementById('roboInput').value.trim();
+            const avatar = document.getElementById('roboAvatar');
+            const bubble = document.getElementById('roboSpeechBubble');
+
+            if (!text) {
+                playWrongSound();
+                bubble.innerText = "Type something first! 🚨";
+                return;
+            }
+
+            playCorrectSound();
+            avatar.style.transform = "scale(1.2) rotate(10deg)";
+            setTimeout(() => avatar.style.transform = "scale(1) rotate(0deg)", 300);
+
+            bubble.innerText = `food = "${text}" 🍕`;
+        }
+
+        function revealStep(stepNum) {
+            playClickSound();
+            const detail = document.getElementById(`stepDetail${stepNum}`);
+            detail.classList.toggle('hidden');
+        }
+
+        let classifiedCount = 0;
+        function classifyItem(id, choice, isCorrect) {
+            const container = document.getElementById(`item-${id}`);
+            if (container.dataset.completed) return;
+
+            if (isCorrect) {
+                playCorrectSound();
+                container.classList.remove('border-purple-700');
+                container.classList.add('border-green-400', 'bg-green-500/10');
+                container.dataset.completed = "true";
+                classifiedCount++;
+                document.getElementById('sortProgressText').innerText = `${classifiedCount} / 4`;
+
+                if (classifiedCount === 4) {
+                    confetti({ particleCount: 80, spread: 80, origin: { y: 0.6 } });
+                }
+            } else {
+                playWrongSound();
+                container.classList.add('border-red-400', 'bg-red-500/10');
+                setTimeout(() => container.classList.remove('border-red-400', 'bg-red-500/10'), 800);
+            }
+        }
+
+        function setCalcMode(mode) {
+            playClickSound();
+            const normalBtn = document.getElementById('modeNormalBtn');
+            const intBtn = document.getElementById('modeIntBtn');
+            const result = document.getElementById('calcResultDisplay');
+
+            if (mode === 'normal') {
+                normalBtn.className = "flex-1 bg-yellow-400 text-purple-950 font-black py-2.5 rounded-xl text-xs sm:text-sm";
+                intBtn.className = "flex-1 bg-purple-800 text-purple-200 font-black py-2.5 rounded-xl text-xs sm:text-sm";
+                result.innerText = '"5" + "5" = "55" ❌';
+                result.className = "text-4xl md:text-5xl font-black text-red-400 code-font";
+            } else {
+                intBtn.className = "flex-1 bg-yellow-400 text-purple-950 font-black py-2.5 rounded-xl text-xs sm:text-sm";
+                normalBtn.className = "flex-1 bg-purple-800 text-purple-200 font-black py-2.5 rounded-xl text-xs sm:text-sm";
+                result.innerText = '5 + 5 = 10 ✅';
+                result.className = "text-4xl md:text-5xl font-black text-green-400 code-font";
+                confetti({ particleCount: 40, spread: 50, origin: { y: 0.6 } });
+            }
+        }
+
+        let foundBugs = 0;
+        function checkBugChoice(btn, isCorrect, msg = '') {
+            const icon = btn.querySelector('.status-icon');
+            const feedback = document.getElementById('bugFeedbackBox');
+
+            if (isCorrect) {
+                playCorrectSound();
+                btn.className = "bg-green-500/20 p-4 rounded-2xl border-2 border-green-400 code-font text-xs sm:text-sm text-green-300 flex flex-col justify-between min-h-[90px] pointer-events-none";
+                icon.innerText = "✅";
+                foundBugs++;
+                feedback.innerText = "Correct! Valid Python line!";
+                feedback.className = "mt-4 p-3.5 rounded-2xl text-center font-bold text-sm bg-green-500/20 text-green-300 border border-green-400 block";
+
+                if (foundBugs === 2) {
+                    confetti({ particleCount: 100, spread: 100, origin: { y: 0.6 } });
+                    document.getElementById('bugCounter').innerText = "Clear! 🎉";
+                }
+            } else {
+                playWrongSound();
+                btn.className = "bg-red-500/20 p-4 rounded-2xl border-2 border-red-400 code-font text-xs sm:text-sm text-red-300 flex flex-col justify-between min-h-[90px]";
+                icon.innerText = "❌";
+                feedback.innerText = `Bug! ${msg}`;
+                feedback.className = "mt-4 p-3.5 rounded-2xl text-center font-bold text-sm bg-red-500/20 text-red-300 border border-red-400 block";
+            }
+        }
+
+        function checkScenario(btn, isCorrect) {
+            const buttons = document.querySelectorAll('#scenarioOptions button');
+            buttons.forEach(b => b.classList.remove('border-green-400', 'border-red-400', 'bg-green-500/20', 'bg-red-500/20'));
+
+            const feedback = document.getElementById('scenarioFeedback');
+
+            if (isCorrect) {
+                playCorrectSound();
+                btn.classList.add('border-green-400', 'bg-green-500/20');
+                feedback.innerText = "🎯 Correct! int() converts the text to a number so + 1 does math!";
+                feedback.className = "p-3.5 rounded-2xl text-center font-bold text-sm bg-green-500/20 text-green-300 border border-green-400 block";
+                confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+            } else {
+                playWrongSound();
+                btn.classList.add('border-red-400', 'bg-red-500/20');
+                feedback.innerText = "❌ Oops! Remember: input() gives text. You need int() to add numbers!";
+                feedback.className = "p-3.5 rounded-2xl text-center font-bold text-sm bg-red-500/20 text-red-300 border border-red-400 block";
+            }
+        }
+
+        let codeTokens = [];
+
+        function addBlockChip(token) {
+            playClickSound();
+            codeTokens.push(token);
+            renderEditor();
+        }
+
+        function clearEditor() {
+            playClickSound();
+            codeTokens = [];
+            renderEditor();
+            document.getElementById('terminalScreen').innerHTML = '<div class="text-slate-500">Console cleared.</div>';
+        }
+
+        function renderEditor() {
+            const dropzone = document.getElementById('editorDropzone');
+            if (codeTokens.length === 0) {
+                dropzone.innerHTML = '<span class="text-slate-500 italic" id="emptyEditorMsg">Tap blocks above to construct code...</span>';
+                return;
+            }
+            dropzone.innerHTML = '';
+            codeTokens.forEach((token, idx) => {
+                const chip = document.createElement('span');
+                chip.className = 'bg-purple-800 text-yellow-300 px-2.5 py-1 rounded-md border border-purple-600 font-mono font-bold text-xs inline-flex items-center gap-1 cursor-pointer hover:bg-purple-700';
+                chip.innerText = token;
+                chip.onclick = () => {
+                    playClickSound();
+                    codeTokens.splice(idx, 1);
+                    renderEditor();
+                };
+                dropzone.appendChild(chip);
+            });
+        }
+
+        function runBuiltCode() {
+            const terminal = document.getElementById('terminalScreen');
+            const constructedCode = codeTokens.join('');
+
+            if (codeTokens.length === 0) {
+                playWrongSound();
+                terminal.innerHTML = '<div class="text-red-400">Workspace is empty! Add blocks first.</div>';
+                return;
+            }
+
+            playCorrectSound();
+            terminal.innerHTML = `<div class="text-yellow-400">$ python script.py</div>`;
+            terminal.innerHTML += `<div class="text-slate-300 code-font">${constructedCode}</div>`;
+
+            if (constructedCode.includes('input')) {
+                terminal.innerHTML += `
+                    <div class="mt-2 text-purple-300 flex flex-col gap-1">
+                        <label for="termInput" class="text-yellow-300 font-bold">Hero Name? </label>
+                        <div class="flex gap-2">
+                            <input type="text" id="termInput" placeholder="Type here & press Enter..." class="bg-slate-900 border border-yellow-400 px-2 py-1 text-green-300 font-mono text-xs rounded outline-none flex-1" />
+                            <button onclick="submitTerminalInput()" class="bg-yellow-400 text-purple-950 font-bold px-3 py-1 rounded text-xs hover:bg-yellow-300">Enter ↵</button>
+                        </div>
+                    </div>
+                    <div id="termOutput" class="mt-2 text-cyan-300"></div>
+                `;
+                setTimeout(() => {
+                    const inputEl = document.getElementById('termInput');
+                    if (inputEl) {
+                        inputEl.focus();
+                        inputEl.addEventListener('keypress', (e) => {
+                            if (e.key === 'Enter') submitTerminalInput();
+                        });
+                    }
+                }, 100);
+            } else if (constructedCode.includes('print')) {
+                terminal.innerHTML += `<div class="text-cyan-300 mt-2">Hi Flash</div>`;
+                confetti({ particleCount: 40, spread: 50, origin: { y: 0.6 } });
+            } else {
+                terminal.innerHTML += `<div class="text-slate-400 mt-2">(Code executed successfully with no output)</div>`;
+            }
+        }
+
+        function submitTerminalInput() {
+            const inputEl = document.getElementById('termInput');
+            const outputEl = document.getElementById('termOutput');
+            if (!inputEl) return;
+
+            const val = inputEl.value.trim() || 'Hero';
+            playCorrectSound();
+
+            const constructedCode = codeTokens.join('');
+            if (constructedCode.includes('print')) {
+                outputEl.innerHTML = `<span class="text-green-400">>>> Hi ${val}! 🚀</span>`;
+            } else {
+                outputEl.innerHTML = `<span class="text-green-400">>>> Stored variable: name = "${val}"</span>`;
+            }
+
+            inputEl.disabled = true;
+            confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+        }
+
+        let prepAnswers = { 1: false, 2: false };
+        function answerPrep(qNum, isCorrect, btn) {
+            const parent = document.getElementById(`prepQ${qNum}Group`);
+            parent.querySelectorAll('button').forEach(b => {
+                b.classList.remove('bg-green-500', 'bg-red-500', 'text-purple-950', 'text-white');
+            });
+
+            if (isCorrect) {
+                playCorrectSound();
+                btn.classList.add('bg-green-500', 'text-purple-950');
+                prepAnswers[qNum] = true;
+            } else {
+                playWrongSound();
+                btn.classList.add('bg-red-500', 'text-white');
+                prepAnswers[qNum] = false;
+            }
+
+            if (prepAnswers[1] && prepAnswers[2]) {
+                document.getElementById('finalBanner').classList.remove('hidden');
+                confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 } });
+            }
+        }
+
+        window.onload = function() {
+            initDropdown();
+            updateDeckUI();
+        };
+    </script>
+</body>
+</html>
