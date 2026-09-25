@@ -3,549 +3,757 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python input() Magic Deck 🪄</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Canvas Confetti CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- Google Fonts: Fredoka & Fira Code -->
+    <title>Python input() Function - Alphagen Learning</title>
+    
+    <!-- Google Fonts: Poppins & Fira Code -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700;900&family=Fira+Code:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600;700&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome & Canvas Confetti CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    },
+                    colors: {
+                        alphagen: {
+                            purple: '#5E48C4',      // Primary Brand Purple
+                            purpleDark: '#4A3AAD',  // Dark Purple hover
+                            purpleMid: '#7B6ED4',   // Decorative fills & borders
+                            purplePale: '#EAE7FE',  // Light note & highlight boxes
+                            purpleGhost: '#F5F4FF', // Page & card ghost background
+                            yellow: '#FFD071',      // Spark Yellow accent
+                            yellowDark: '#E6B84A',  // Yellow text on light surfaces
+                            yellowPale: '#FFF3CC',  // Soft highlight background
+                            nearBlack: '#1A1A1A',   // Primary text
+                            darkGrey: '#404048',    // Secondary text
+                            midGrey: '#888896',     // Captions & labels
+                            lightGrey: '#F2F2F4',   // Neutral card background
+                            cyan: '#59E4FB',        // Tech accent light
+                            cyanDark: '#055F6E',    // Tech accent dark
+                            cyanPale: '#E0FAFE',    // Tech pale background
+                            coral: '#ED5661',       // Warning / bug accent
+                            coralDark: '#993040',   // Warning dark text
+                            coralPale: '#FFF0F1'    // Warning pale background
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
         body {
-            font-family: 'Fredoka', sans-serif;
-            background: linear-gradient(135deg, #1E1B4B 0%, #2E1065 100%);
-            color: #FFFFFF;
-            min-height: 100vh;
-            user-select: none;
+            margin: 0;
+            padding: 0;
+            background-color: #0f081d;
+            font-family: 'Poppins', sans-serif;
+            color: #1A1A1A;
             overflow-x: hidden;
-        }
-
-        .code-font {
-            font-family: 'Fira Code', monospace;
-        }
-
-        /* Bouncy Interactions */
-        .bounce-btn {
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s;
-        }
-        .bounce-btn:hover {
-            transform: translateY(-4px) scale(1.03);
-            box-shadow: 0 10px 20px -5px rgba(250, 204, 21, 0.4);
-        }
-        .bounce-btn:active {
-            transform: translateY(1px) scale(0.97);
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 15px rgba(250, 204, 21, 0.4); }
-            50% { box-shadow: 0 0 35px rgba(250, 204, 21, 0.9); }
-        }
-        .glow-yellow {
-            animation: pulseGlow 2s infinite;
-        }
-
-        .slide-container {
-            display: none;
-            opacity: 0;
-            transform: translateY(12px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        .slide-container.active {
+            user-select: none;
+            min-height: 100vh;
             display: flex;
-            opacity: 1;
-            transform: translateY(0);
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
-        .card-dark {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(14px);
-            border: 2px solid rgba(255, 255, 255, 0.15);
+        /* 1280x720 Fixed Presentation Stage Frame */
+        .slide-stage {
+            width: 1280px;
+            height: 720px;
+            margin: 16px auto 0 auto;
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+            background-color: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid #EAE7FE;
         }
 
-        .terminal-box {
-            background-color: #0F172A;
-            border: 2px solid #334155;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.7);
+        .slide-panel {
+            width: 1280px;
+            height: 720px;
+            padding: 36px 52px;
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            position: absolute;
+            top: 0;
+            left: 0;
+            box-sizing: border-box;
+            background: #ffffff;
+        }
+
+        .slide-panel.active {
+            display: flex;
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Interactive Element Hover Effects */
+        .btn-interactive {
+            cursor: pointer;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease, background-color 0.2s ease;
+        }
+        .btn-interactive:hover {
+            transform: translateY(-2px) scale(1.02);
+        }
+        .btn-interactive:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        /* Bottom Fixed Nav Bar */
+        .nav-bar {
+            width: 1280px;
+            margin: 12px auto 16px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+        }
+
+        .nav-btn {
+            background: #2A1C68;
+            color: #FFD071;
+            border: 2px solid #5E48C4;
+            padding: 12px 28px;
+            border-radius: 16px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+        .nav-btn:hover:not(:disabled) {
+            background: #5E48C4;
+            color: #ffffff;
+            transform: scale(1.04);
+        }
+        .nav-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .dot-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #2A1C68;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .dot-indicator.active {
+            background: #FFD071;
+            width: 26px;
+            border-radius: 10px;
+        }
+
+        /* Yellow Wavy Underline for Highlighted Text */
+        .spark-wavy-underline {
+            position: relative;
+            display: inline-block;
+            color: #5E48C4;
+        }
+        .spark-wavy-underline::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -8px;
+            width: 100%;
+            height: 10px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 4' preserveAspectRatio='none'%3E%3Cpath d='M0 2 Q 5 0, 10 2 T 20 2' fill='none' stroke='%23FFD071' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: repeat-x;
+            background-size: 18px 10px;
+        }
+
+        /* Quiz Components */
+        .quiz-option {
+            background: #ffffff;
+            border: 2px solid #EAE7FE;
+            border-radius: 18px;
+            padding: 20px 24px;
+            font-size: 17px;
+            font-weight: 600;
+            color: #1A1A1A;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .quiz-option:hover {
+            border-color: #5E48C4;
+            background: #F5F4FF;
+        }
+        .quiz-option.selected-correct {
+            background: #f0fdf4 !important;
+            border-color: #22c55e !important;
+            color: #14532d !important;
+        }
+        .quiz-option.selected-wrong {
+            background: #FFF0F1 !important;
+            border-color: #ED5661 !important;
+            color: #993040 !important;
         }
 
         /* Speech bubble arrow */
         .bubble-arrow::before {
             content: '';
             position: absolute;
-            left: -12px;
-            top: 20px;
-            border-width: 8px 12px 8px 0;
+            left: -14px;
+            top: 28px;
+            border-width: 10px 14px 10px 0;
             border-style: solid;
-            border-color: transparent #FFFFFF transparent transparent;
+            border-color: transparent #5E48C4 transparent transparent;
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen justify-between p-3 md:p-6 overflow-y-auto">
+<body>
 
-    <!-- TOP NAVIGATION BAR -->
-    <header class="w-full max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 rounded-2xl card-dark z-20 mb-3">
-        <div class="flex items-center gap-3 cursor-pointer" onclick="goToSlide(0)">
-            <span class="text-3xl">🤖</span>
-            <div>
-                <h1 class="text-xl md:text-2xl font-black text-yellow-400 leading-none">Python input()</h1>
-                <p class="text-xs text-purple-200">Interactive Visual Guide</p>
+    <!-- Main Presentation Stage Card -->
+    <div class="slide-stage">
+
+        <header class="w-full bg-white border-b border-alphagen-purplePale px-8 py-3 flex items-center justify-between z-50">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-alphagen-purple flex items-center justify-center text-white text-xl shadow-md shadow-alphagen-purple/20">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base md:text-lg text-alphagen-nearBlack tracking-tight">Python Input</h1>
+                    <p class="text-xs font-semibold text-alphagen-purple">Python input() Function</p>
+                </div>
             </div>
-        </div>
-
-        <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-            <!-- Slide Selector -->
-            <select id="slideSelect" onchange="goToSlide(parseInt(this.value))" class="bg-purple-950 text-yellow-300 font-bold px-3 py-1.5 rounded-xl border border-yellow-400/40 text-xs sm:text-sm cursor-pointer outline-none">
-                <!-- Populated via JS -->
-            </select>
-
-            <!-- Slide Indicator -->
-            <span id="slideIndicator" class="bg-yellow-400 text-purple-950 px-3.5 py-1 rounded-full font-black text-xs sm:text-sm shadow-md whitespace-nowrap">
-                1 / 11
-            </span>
-        </div>
-    </header>
-
-    <!-- Progress Bar -->
-    <div class="w-full max-w-6xl mx-auto bg-purple-950 rounded-full h-2.5 mb-4 overflow-hidden border border-purple-800">
-        <div id="deckProgressBar" class="bg-gradient-to-r from-yellow-400 to-green-400 h-full w-1/11 transition-all duration-300"></div>
-    </div>
-
-    <!-- MAIN SLIDE AREA -->
-    <main class="w-full max-w-6xl mx-auto flex-grow flex items-center justify-center my-auto min-h-[500px]">
-
-        <!-- SLIDE 1: TITLE -->
-        <section id="slide-0" class="slide-container active flex-col items-center justify-center text-center p-6 md:p-12 rounded-3xl card-dark w-full h-full relative">
-            <span class="text-8xl md:text-9xl mb-4 block animate-bounce">🤖</span>
             
-            <h2 class="text-4xl md:text-7xl font-black text-yellow-400 mb-3 tracking-tight">
-                Python <code class="code-font text-white bg-purple-950 px-3 py-1 rounded-2xl border-2 border-yellow-400">input()</code>
-            </h2>
-            
-            <p class="text-xl md:text-3xl text-purple-100 font-bold max-w-lg mb-8">
-                Make your code LISTEN to you! 🎧
-            </p>
+            <!-- Dots Indicator Header Middle -->
+            <div class="flex items-center gap-2" id="header-dots-container">
+                <!-- Dots generated dynamically in JS -->
+            </div>
 
-            <button onclick="nextSlide()" class="bounce-btn glow-yellow bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black text-2xl px-10 py-4 rounded-2xl shadow-2xl flex items-center gap-3">
-                <span>Start</span>
-                <span class="text-3xl">🚀</span>
+            <!-- Controls: Slide Counter, Dropdown, Sound Toggle -->
+            <div class="flex items-center gap-3">
+                <span id="slide-counter-pill" class="text-sm font-bold text-alphagen-purple bg-alphagen-purpleGhost px-4 py-1.5 rounded-full border border-alphagen-purplePale">
+                    Slide 1 / 11
+                </span>
+
+                <!-- Slide Dropdown Jump Menu -->
+                <select id="slide-dropdown" onchange="goToSlide(parseInt(this.value))" class="text-sm font-bold text-alphagen-nearBlack bg-alphagen-lightGrey hover:bg-slate-200 border border-slate-200 px-3.5 py-1.5 rounded-xl cursor-pointer focus:outline-none focus:border-alphagen-purple transition">
+                    <option value="1">1. Welcome</option>
+                    <option value="2">2. Ice Cream Shop Analogy</option>
+                    <option value="3">3. Robo Ear Simulator</option>
+                    <option value="4">4. How Data Moves</option>
+                    <option value="5">5. Input vs Output</option>
+                    <option value="6">6. The Text Trap!</option>
+                    <option value="7">7. Golden Syntax Rules Quiz</option>
+                    <option value="8">8. Bug Hunt!</option>
+                    <option value="9">9. Scenario Quiz</option>
+                    <option value="10">10. Code Builder</option>
+                    <option value="11">11. Coding Challenge</option>
+                </select>
+
+                <button onclick="toggleAudio()" id="audio-btn" class="w-9 h-9 rounded-xl bg-alphagen-purpleGhost hover:bg-alphagen-purplePale text-alphagen-purple border border-alphagen-purplePale flex items-center justify-center text-sm transition btn-interactive" title="Toggle Sound">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- ================= SLIDE 1: WELCOME SLIDE ================= -->
+        <div id="slide-1" class="slide-panel active justify-center items-center text-center">
+            <div class="inline-flex items-center gap-2 bg-alphagen-purpleGhost border border-alphagen-purplePale text-alphagen-purple text-sm font-extrabold px-5 py-2.5 rounded-full mb-8 shadow-xs tracking-wider">
+                <span>🚀</span> INTERACTIVE CODING LESSON
+            </div>
+
+            <h1 class="text-6xl md:text-7xl font-extrabold text-alphagen-nearBlack mb-8 tracking-tight">
+                Let's learn Python <span class="spark-wavy-underline">input()</span>!
+            </h1>
+
+           
+
+            <button onclick="nextSlide(); playSound('pop');" class="bg-alphagen-yellow hover:bg-alphagen-yellowDark text-alphagen-nearBlack font-extrabold text-xl px-10 py-5 rounded-2xl shadow-xl shadow-alphagen-yellow/30 btn-interactive flex items-center gap-4">
+                <span>Let's Explore!</span>
+                <i class="fa-solid fa-arrow-right"></i>
             </button>
-        </section>
+        </div>
 
-        <!-- SLIDE 2: HOOK & REAL-LIFE ANALOGY -->
-        <section id="slide-1" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
-            <div class="flex items-center gap-3 mb-4">
-                <span class="text-4xl">🍦</span>
-                <h2 class="text-2xl md:text-4xl font-black text-yellow-400">The Ice Cream Shop</h2>
-            </div>
-            
-            <p class="text-lg md:text-xl text-purple-100 font-bold mb-6">
-                The chef asks: <span class="text-yellow-300">"What flavor?"</span> What happens next?
-            </p>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="quiz-s2">
-                <button onclick="checkQuizS2(this, false)" class="bounce-btn bg-purple-900/60 p-5 rounded-2xl border-2 border-purple-700 hover:border-yellow-400 text-left flex items-center gap-4">
-                    <span class="text-4xl">🙈</span>
-                    <span class="font-bold text-base md:text-lg">Chef guesses randomly</span>
-                </button>
-                <button onclick="checkQuizS2(this, false)" class="bounce-btn bg-purple-900/60 p-5 rounded-2xl border-2 border-purple-700 hover:border-yellow-400 text-left flex items-center gap-4">
-                    <span class="text-4xl">🏃‍♂️</span>
-                    <span class="font-bold text-base md:text-lg">Chef runs away</span>
-                </button>
-                <button onclick="checkQuizS2(this, true)" class="bounce-btn bg-purple-900/60 p-5 rounded-2xl border-2 border-purple-700 hover:border-yellow-400 text-left flex items-center gap-4">
-                    <span class="text-4xl">⏳</span>
-                    <span class="font-bold text-base md:text-lg text-yellow-300">Chef PAUSES and WAITS for you!</span>
-                </button>
-                <button onclick="checkQuizS2(this, false)" class="bounce-btn bg-purple-900/60 p-5 rounded-2xl border-2 border-purple-700 hover:border-yellow-400 text-left flex items-center gap-4">
-                    <span class="text-4xl">💥</span>
-                    <span class="font-bold text-base md:text-lg">The shop closes</span>
-                </button>
+        <!-- ================= SLIDE 2: HOOK & REAL-LIFE ANALOGY ================= -->
+        <div id="slide-2" class="slide-panel bg-white">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs uppercase font-extrabold tracking-wider text-alphagen-purple bg-alphagen-purpleGhost px-3.5 py-1.5 rounded-md border border-alphagen-purplePale">Real-World Analogy</span>
+                    <span class="text-sm font-bold text-alphagen-midGrey"></span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-alphagen-nearBlack mb-2">The Ice Cream Shop</h2>
+                <p class="text-lg md:text-xl text-alphagen-darkGrey mb-4">The chef asks: <strong class="text-alphagen-purple">"What flavor would you like?"</strong> What happens next?</p>
             </div>
 
-            <div id="quiz-s2-feedback" class="hidden mt-6 p-4 rounded-2xl bg-green-500/20 border-2 border-green-400 text-green-300 font-bold text-lg text-center">
-                🎯 Exactly! <code class="code-font bg-purple-950 px-2 py-0.5 rounded text-yellow-300">input()</code> pauses Python and waits for your answer!
+            <div class="grid grid-cols-2 gap-6 items-center my-auto" id="quiz-s2">
+                <button onclick="checkQuizS2(this, false)" class="quiz-option btn-interactive py-5 px-6">
+                    <span class="text-lg font-bold text-alphagen-nearBlack">Chef guesses randomly</span>
+                    <i class="fa-regular fa-circle text-alphagen-purple text-2xl"></i>
+                </button>
+                <button onclick="checkQuizS2(this, false)" class="quiz-option btn-interactive py-5 px-6">
+                    <span class="text-lg font-bold text-alphagen-nearBlack">Chef runs away</span>
+                    <i class="fa-regular fa-circle text-alphagen-purple text-2xl"></i>
+                </button>
+                <button onclick="checkQuizS2(this, true)" class="quiz-option btn-interactive py-5 px-6">
+                    <span class="text-lg font-bold text-alphagen-nearBlack">Chef PAUSES and WAITS for you!</span>
+                    <i class="fa-regular fa-circle text-alphagen-purple text-2xl"></i>
+                </button>
+                <button onclick="checkQuizS2(this, false)" class="quiz-option btn-interactive py-5 px-6">
+                    <span class="text-lg font-bold text-alphagen-nearBlack">The shop closes immediately</span>
+                    <i class="fa-regular fa-circle text-alphagen-purple text-2xl"></i>
+                </button>
             </div>
-        </section>
 
-        <!-- SLIDE 3: INTERACTIVE SIMULATOR -->
-        <section id="slide-2" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
-            <div class="flex items-center gap-3 mb-4">
-                <span class="text-4xl">🎧</span>
-                <h2 class="text-2xl md:text-4xl font-black text-yellow-400">Robo Ear Simulator</h2>
+          
+        </div>
+
+        <!-- ================= SLIDE 3: INTERACTIVE SIMULATOR ================= -->
+        <div id="slide-3" class="slide-panel bg-white">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs uppercase font-extrabold tracking-wider text-alphagen-purple bg-alphagen-purpleGhost px-3.5 py-1.5 rounded-md border border-alphagen-purplePale">Interactive Simulator</span>
+                    <span class="text-sm font-bold text-alphagen-midGrey"></span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-alphagen-nearBlack mb-2">Let's Understand Input Command</h2>
+                <p class="text-base md:text-lg text-alphagen-darkGrey mb-4">Type your favorite snack</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center mb-4">
+            <div class="grid grid-cols-2 gap-8 items-center my-auto">
                 <!-- Controls -->
-                <div class="bg-purple-950/90 p-5 rounded-2xl border-2 border-yellow-400/40 flex flex-col gap-3">
-                    <div class="code-font text-xs sm:text-sm bg-slate-900 p-3 rounded-xl border border-slate-700 text-purple-300">
-                        food = <span class="text-green-400">input</span>(<span class="text-amber-300">"Favorite snack? "</span>)
+                <div class="bg-alphagen-purpleGhost border-2 border-alphagen-purplePale p-7 rounded-3xl flex flex-col gap-5">
+                    <div class="font-mono text-lg bg-alphagen-nearBlack p-5 rounded-2xl border border-slate-800 text-white shadow-inner">
+                        food = <span class="text-emerald-400 font-bold">input</span>(<span class="text-alphagen-yellow font-bold">"Favorite snack? "</span>)
                     </div>
-                    <input type="text" id="roboInput" placeholder="Type a food (e.g. Pizza 🍕)" class="bg-purple-900 text-white font-bold px-4 py-3 rounded-xl border-2 border-yellow-400 outline-none text-base" />
-                    <button onclick="runRoboSim()" class="bounce-btn bg-yellow-400 text-purple-950 font-black py-3 rounded-xl text-lg flex items-center justify-center gap-2">
-                        <span>Send to Python ➡️</span>
+                    <input type="text" id="roboInput" placeholder="Type a food (e.g. Pizza)" class="bg-white text-alphagen-nearBlack font-bold px-5 py-4 rounded-2xl border-2 border-alphagen-purplePale focus:border-alphagen-purple outline-none text-lg transition" />
+                    <button onclick="runRoboSim()" class="btn-interactive bg-alphagen-yellow hover:bg-alphagen-yellowDark text-alphagen-nearBlack font-extrabold py-4 rounded-2xl text-lg shadow-md">
+                        Send to Python ➔
                     </button>
                 </div>
 
                 <!-- Display -->
-                <div class="bg-purple-900/40 p-6 rounded-2xl border-2 border-purple-700 flex items-center justify-center min-h-[180px] gap-4 relative">
-                    <div id="roboAvatar" class="text-7xl transition-transform">🤖</div>
-                    <div id="roboSpeechBubble" class="relative bubble-arrow bg-white text-purple-950 font-extrabold p-4 rounded-2xl text-base shadow-xl max-w-[200px]">
+                <div class="bg-alphagen-purpleGhost border-2 border-alphagen-purplePale p-8 rounded-3xl flex items-center justify-center min-h-[260px] gap-8 relative">
+                    <div id="roboAvatar" class="text-8xl transition-transform">🤖</div>
+                    <div id="roboSpeechBubble" class="relative bubble-arrow bg-alphagen-purple text-white font-extrabold p-6 rounded-2xl text-lg shadow-lg max-w-[260px]">
                         "I am listening..."
                     </div>
                 </div>
             </div>
 
-            <div class="bg-yellow-400/10 border-2 border-yellow-400/80 p-3.5 rounded-2xl flex items-center gap-3 text-yellow-300 font-bold text-sm md:text-base">
-                <span class="text-2xl">💡</span>
-                <span>NOTICE: <code class="code-font bg-purple-950 px-2 py-0.5 rounded text-white">input()</code> freezes code execution until you press Enter!</span>
+            <div class="bg-alphagen-yellowPale border border-alphagen-yellowDark/40 p-4 rounded-2xl text-base md:text-lg text-alphagen-nearBlack font-semibold text-center">
+                💡 Key Observation: <code class="font-mono bg-white px-2.5 py-1 rounded text-alphagen-purple font-bold">input()</code> pauses execution until you submit your text!
             </div>
-        </section>
+        </div>
 
-        <!-- SLIDE 4: CONCEPT FLOW VISUAL -->
-        <section id="slide-3" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
-            <div class="flex items-center gap-3 mb-6">
-                <span class="text-4xl">🔄</span>
-                <h2 class="text-2xl md:text-4xl font-black text-yellow-400">How Data Moves</h2>
+        <!-- ================= SLIDE 4: CONCEPT FLOW VISUAL ================= -->
+        <div id="slide-4" class="slide-panel bg-white">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs uppercase font-extrabold tracking-wider text-alphagen-purple bg-alphagen-purpleGhost px-3.5 py-1.5 rounded-md border border-alphagen-purplePale"></span>
+                    <span class="text-sm font-bold text-alphagen-midGrey"></span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-alphagen-nearBlack mb-2">How Data Moves</h2>
+                <p class="text-base md:text-lg text-alphagen-darkGrey mb-4">Click each card below to see how Python captures and stores user data:</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="grid grid-cols-3 gap-6 my-auto">
                 <!-- Step 1 -->
-                <div onclick="revealStep(1)" class="bounce-btn bg-purple-900/60 p-5 rounded-2xl border-2 border-purple-600 cursor-pointer text-center" id="stepCard1">
-                    <span class="text-5xl mb-2 block">💬</span>
-                    <h3 class="font-black text-yellow-300 text-lg">1. Prompt</h3>
-                    <p class="text-xs text-purple-200 mt-1">Question on screen</p>
-                    <div class="mt-3 text-xs code-font bg-purple-950 p-2 rounded text-green-300 hidden" id="stepDetail1">
+                <div onclick="revealStep(1)" class="btn-interactive bg-alphagen-purpleGhost border-2 border-alphagen-purplePale hover:border-alphagen-purple p-7 rounded-3xl text-center flex flex-col justify-between h-full space-y-4">
+                    <div>
+                        <div class="text-6xl mb-4">💬</div>
+                        <h3 class="font-extrabold text-alphagen-nearBlack text-xl mb-2">1. Prompt</h3>
+                        <p class="text-sm md:text-base text-alphagen-darkGrey">Displays question on screen</p>
+                    </div>
+                    <div class="mt-4 text-sm md:text-base font-mono bg-alphagen-nearBlack p-4 rounded-2xl text-emerald-400 font-bold hidden" id="stepDetail1">
                         input("Name? ")
                     </div>
                 </div>
 
                 <!-- Step 2 -->
-                <div onclick="revealStep(2)" class="bounce-btn bg-purple-900/60 p-5 rounded-2xl border-2 border-purple-600 cursor-pointer text-center" id="stepCard2">
-                    <span class="text-5xl mb-2 block">⌨️</span>
-                    <h3 class="font-black text-yellow-300 text-lg">2. User Types</h3>
-                    <p class="text-xs text-purple-200 mt-1">Answer via keyboard</p>
-                    <div class="mt-3 text-xs code-font bg-purple-950 p-2 rounded text-amber-300 hidden" id="stepDetail2">
+                <div onclick="revealStep(2)" class="btn-interactive bg-alphagen-purpleGhost border-2 border-alphagen-purplePale hover:border-alphagen-purple p-7 rounded-3xl text-center flex flex-col justify-between h-full space-y-4">
+                    <div>
+                        <div class="text-6xl mb-4">⌨️</div>
+                        <h3 class="font-extrabold text-alphagen-nearBlack text-xl mb-2">2. User Types</h3>
+                        <p class="text-sm md:text-base text-alphagen-darkGrey">User enters answer via keyboard</p>
+                    </div>
+                    <div class="mt-4 text-sm md:text-base font-mono bg-alphagen-nearBlack p-4 rounded-2xl text-alphagen-yellow font-bold hidden" id="stepDetail2">
                         "Alex"
                     </div>
                 </div>
 
                 <!-- Step 3 -->
-                <div onclick="revealStep(3)" class="bounce-btn bg-purple-900/60 p-5 rounded-2xl border-2 border-purple-600 cursor-pointer text-center" id="stepCard3">
-                    <span class="text-5xl mb-2 block">📦</span>
-                    <h3 class="font-black text-yellow-300 text-lg">3. Variable Box</h3>
-                    <p class="text-xs text-purple-200 mt-1">Saved inside box</p>
-                    <div class="mt-3 text-xs code-font bg-purple-950 p-2 rounded text-cyan-300 hidden" id="stepDetail3">
+                <div onclick="revealStep(3)" class="btn-interactive bg-alphagen-purpleGhost border-2 border-alphagen-purplePale hover:border-alphagen-purple p-7 rounded-3xl text-center flex flex-col justify-between h-full space-y-4">
+                    <div>
+                        <div class="text-6xl mb-4">📦</div>
+                        <h3 class="font-extrabold text-alphagen-nearBlack text-xl mb-2">3. Data gets Stored</h3>
+                        <p class="text-sm md:text-base text-alphagen-darkGrey">Stored safely in memory</p>
+                    </div>
+                    <div class="mt-4 text-sm md:text-base font-mono bg-alphagen-nearBlack p-4 rounded-2xl text-alphagen-cyan font-bold hidden" id="stepDetail3">
                         name = "Alex"
                     </div>
                 </div>
             </div>
 
-            <div class="bg-purple-950 p-4 rounded-2xl border border-purple-700 text-center">
-                <span class="code-font text-yellow-300 font-bold text-base md:text-lg">box_name = input("Question")</span>
+            <div class="bg-alphagen-purpleGhost border-2 border-dashed border-alphagen-purple p-4 rounded-2xl text-base md:text-lg text-alphagen-purple font-bold text-center">
+                Syntax Pattern: <code class="font-mono bg-white px-2.5 py-1 rounded text-alphagen-purple">variable_name = input("Prompt Question")</code>
             </div>
-        </section>
+        </div>
 
-        <!-- SLIDE 5: CONCEPT SORTING -->
-        <section id="slide-4" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-3">
-                    <span class="text-4xl">🎯</span>
-                    <h2 class="text-2xl md:text-4xl font-black text-yellow-400">Input or Output?</h2>
+        <!-- ================= SLIDE 5: CONCEPT SORTING ================= -->
+        <div id="slide-5" class="slide-panel bg-white">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs uppercase font-extrabold tracking-wider text-alphagen-purple bg-alphagen-purpleGhost px-3.5 py-1.5 rounded-md border border-alphagen-purplePale"></span>
+                    <span id="sortProgressText" class="text-sm font-bold bg-alphagen-yellow text-alphagen-nearBlack px-3.5 py-1.5 rounded-full">0 / 4 Sorted</span>
                 </div>
-                <span id="sortProgressText" class="text-sm font-bold bg-purple-950 text-yellow-300 px-3 py-1 rounded-full border border-purple-700">0 / 4</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-alphagen-nearBlack mb-2">Input or Output?</h2>
+                <p class="text-base md:text-lg text-alphagen-darkGrey mb-4">Classify each action correctly as an Input or Output:</p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="classifierGrid">
-                <div class="bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 flex flex-col justify-between" id="item-c1">
-                    <span class="font-bold text-base mb-3">⌨️ Typing your name</span>
-                    <div class="flex gap-2">
-                        <button onclick="classifyItem('c1', 'input', true)" class="flex-1 bg-purple-800 hover:bg-yellow-400 hover:text-purple-950 py-2 rounded-xl font-bold text-xs">Input 📥</button>
-                        <button onclick="classifyItem('c1', 'output', false)" class="flex-1 bg-purple-800 hover:bg-yellow-400 hover:text-purple-950 py-2 rounded-xl font-bold text-xs">Output 📤</button>
+            <div class="grid grid-cols-2 gap-6 my-auto" id="classifierGrid">
+                <div class="bg-alphagen-purpleGhost border-2 border-alphagen-purplePale p-6 rounded-3xl flex flex-col justify-between" id="item-c1">
+                    <span class="font-bold text-lg text-alphagen-nearBlack mb-4">Typing your name into a form</span>
+                    <div class="flex gap-4">
+                        <button onclick="classifyItem('c1', 'input', true)" class="btn-interactive flex-1 bg-alphagen-purpleGhost border border-alphagen-purplePale text-alphagen-nearBlack py-3 rounded-2xl font-bold text-sm md:text-base">Input</button>
+                        <button onclick="classifyItem('c1', 'output', false)" class="btn-interactive flex-1 bg-alphagen-purpleGhost border border-alphagen-purplePale text-alphagen-nearBlack py-3 rounded-2xl font-bold text-sm md:text-base">Output</button>
                     </div>
                 </div>
 
-                <div class="bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 flex flex-col justify-between" id="item-c2">
-                    <span class="font-bold text-base mb-3">🖥️ High score printed</span>
-                    <div class="flex gap-2">
-                        <button onclick="classifyItem('c2', 'input', false)" class="flex-1 bg-purple-800 hover:bg-yellow-400 hover:text-purple-950 py-2 rounded-xl font-bold text-xs">Input 📥</button>
-                        <button onclick="classifyItem('c2', 'output', true)" class="flex-1 bg-purple-800 hover:bg-yellow-400 hover:text-purple-950 py-2 rounded-xl font-bold text-xs">Output 📤</button>
+                <div class="bg-alphagen-purpleGhost border-2 border-alphagen-purplePale p-6 rounded-3xl flex flex-col justify-between" id="item-c2">
+                    <span class="font-bold text-lg text-alphagen-nearBlack mb-4">High score displayed on screen</span>
+                    <div class="flex gap-4">
+                        <button onclick="classifyItem('c2', 'input', false)" class="btn-interactive flex-1 bg-alphagen-purpleGhost border border-alphagen-purplePale text-alphagen-nearBlack py-3 rounded-2xl font-bold text-sm md:text-base">Input</button>
+                        <button onclick="classifyItem('c2', 'output', true)" class="btn-interactive flex-1 bg-alphagen-purpleGhost border border-alphagen-purplePale text-alphagen-nearBlack py-3 rounded-2xl font-bold text-sm md:text-base">Output</button>
                     </div>
                 </div>
 
-                <div class="bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 flex flex-col justify-between" id="item-c3">
-                    <span class="font-bold text-base mb-3">🎤 Mic voice command</span>
-                    <div class="flex gap-2">
-                        <button onclick="classifyItem('c3', 'input', true)" class="flex-1 bg-purple-800 hover:bg-yellow-400 hover:text-purple-950 py-2 rounded-xl font-bold text-xs">Input 📥</button>
-                        <button onclick="classifyItem('c3', 'output', false)" class="flex-1 bg-purple-800 hover:bg-yellow-400 hover:text-purple-950 py-2 rounded-xl font-bold text-xs">Output 📤</button>
+                <div class="bg-alphagen-purpleGhost border-2 border-alphagen-purplePale p-6 rounded-3xl flex flex-col justify-between" id="item-c3">
+                    <span class="font-bold text-lg text-alphagen-nearBlack mb-4">Speaking a voice command into a microphone</span>
+                    <div class="flex gap-4">
+                        <button onclick="classifyItem('c3', 'input', true)" class="btn-interactive flex-1 bg-alphagen-purpleGhost border border-alphagen-purplePale text-alphagen-nearBlack py-3 rounded-2xl font-bold text-sm md:text-base">Input</button>
+                        <button onclick="classifyItem('c3', 'output', false)" class="btn-interactive flex-1 bg-alphagen-purpleGhost border border-alphagen-purplePale text-alphagen-nearBlack py-3 rounded-2xl font-bold text-sm md:text-base">Output</button>
                     </div>
                 </div>
 
-                <div class="bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 flex flex-col justify-between" id="item-c4">
-                    <span class="font-bold text-base mb-3">🔊 Speaker music</span>
-                    <div class="flex gap-2">
-                        <button onclick="classifyItem('c4', 'input', false)" class="flex-1 bg-purple-800 hover:bg-yellow-400 hover:text-purple-950 py-2 rounded-xl font-bold text-xs">Input 📥</button>
-                        <button onclick="classifyItem('c4', 'output', true)" class="flex-1 bg-purple-800 hover:bg-yellow-400 hover:text-purple-950 py-2 rounded-xl font-bold text-xs">Output 📤</button>
+                <div class="bg-alphagen-purpleGhost border-2 border-alphagen-purplePale p-6 rounded-3xl flex flex-col justify-between" id="item-c4">
+                    <span class="font-bold text-lg text-alphagen-nearBlack mb-4">Music playing through a speaker</span>
+                    <div class="flex gap-4">
+                        <button onclick="classifyItem('c4', 'input', false)" class="btn-interactive flex-1 bg-alphagen-purpleGhost border border-alphagen-purplePale text-alphagen-nearBlack py-3 rounded-2xl font-bold text-sm md:text-base">Input</button>
+                        <button onclick="classifyItem('c4', 'output', true)" class="btn-interactive flex-1 bg-alphagen-purpleGhost border border-alphagen-purplePale text-alphagen-nearBlack py-3 rounded-2xl font-bold text-sm md:text-base">Output</button>
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- SLIDE 6: THE STRING TRAP -->
-        <section id="slide-5" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
-            <div class="flex items-center gap-3 mb-4">
-                <span class="text-4xl">🪤</span>
-                <h2 class="text-2xl md:text-4xl font-black text-yellow-400">The Text Trap!</h2>
+            <div class="bg-alphagen-purpleGhost border-2 border-dashed border-alphagen-purple p-4 rounded-2xl text-base md:text-lg text-alphagen-purple font-bold text-center">
+                Click Input or Output for all 4 boxes!
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 6: THE STRING TRAP ================= -->
+        <div id="slide-6" class="slide-panel bg-white">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs uppercase font-extrabold tracking-wider text-alphagen-purple bg-alphagen-purpleGhost px-3.5 py-1.5 rounded-md border border-alphagen-purplePale">Type Conversion</span>
+                    <span class="text-sm font-bold text-alphagen-nearBlack bg-alphagen-yellow px-3 py-1 rounded-md"></span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-alphagen-nearBlack mb-2">Data is Always String</h2>
+                <p class="text-base md:text-lg text-alphagen-darkGrey mb-4"><code class="font-mono text-alphagen-purple font-bold">input()</code> always returns data as <strong>TEXT (String)</strong>, even if you type numbers!</p>
             </div>
 
-            <p class="text-base md:text-lg text-purple-100 font-bold mb-4">
-                <code class="code-font bg-purple-950 px-2 py-0.5 rounded text-yellow-300">input()</code> turns ALL numbers into TEXT!
-            </p>
-
-            <div class="bg-purple-950 p-5 rounded-2xl border-2 border-purple-700 mb-4">
-                <div class="flex gap-3 mb-4">
-                    <button id="modeNormalBtn" onclick="setCalcMode('normal')" class="flex-1 bg-yellow-400 text-purple-950 font-black py-2.5 rounded-xl text-xs sm:text-sm">
+            <div class="bg-alphagen-purpleGhost border-2 border-alphagen-purplePale p-8 rounded-3xl my-auto space-y-6">
+                <div class="flex gap-6">
+                    <button id="modeNormalBtn" onclick="setCalcMode('normal')" class="btn-interactive flex-1 bg-alphagen-purple text-white font-extrabold py-4 rounded-2xl text-base md:text-lg shadow-md">
                         Raw input()
                     </button>
-                    <button id="modeIntBtn" onclick="setCalcMode('int')" class="flex-1 bg-purple-800 text-purple-200 font-black py-2.5 rounded-xl text-xs sm:text-sm">
+                    <button id="modeIntBtn" onclick="setCalcMode('int')" class="btn-interactive flex-1 bg-white border border-alphagen-purplePale text-alphagen-nearBlack font-extrabold py-4 rounded-2xl text-base md:text-lg">
                         int(input())
                     </button>
                 </div>
 
-                <div class="bg-slate-900 p-6 rounded-xl border border-slate-800 text-center">
-                    <div class="text-xs text-purple-300 mb-2 font-bold">5 + 5 Result:</div>
-                    <div id="calcResultDisplay" class="text-4xl md:text-5xl font-black text-red-400 code-font">
-                        "5" + "5" = "55" ❌
+                <div class="bg-alphagen-nearBlack p-8 rounded-2xl border border-slate-800 text-center shadow-inner">
+                    <div class="text-sm md:text-base font-mono text-slate-400 mb-3">Code Calculation: 5 + 5</div>
+                    <div id="calcResultDisplay" class="text-5xl md:text-6xl font-extrabold text-alphagen-coral font-mono">
+                        "5" + "5" = "55"
                     </div>
                 </div>
             </div>
 
-            <div class="bg-green-500/10 border-2 border-green-400 p-3.5 rounded-2xl flex items-center gap-3 text-green-300 font-bold text-sm">
-                <span class="text-3xl">✨</span>
-                <span>FIX: Wrap with <code class="code-font text-yellow-300 bg-purple-950 px-2 py-0.5 rounded">int(input(...))</code> for REAL math!</span>
+            <div class="bg-emerald-50 border border-emerald-300 p-4 rounded-2xl text-base md:text-lg text-emerald-950 font-bold text-center">
+                ✨ FIX: Wrap with <code class="font-mono bg-white px-2.5 py-1 rounded text-emerald-700">int(input(...))</code> to perform real mathematical calculations!
             </div>
-        </section>
+        </div>
 
-        <!-- SLIDE 7: SYNTAX RULES -->
-        <section id="slide-6" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
-            <div class="flex items-center gap-3 mb-4">
-                <span class="text-4xl">📜</span>
-                <h2 class="text-2xl md:text-4xl font-black text-yellow-400">Golden Rules</h2>
+        <!-- ================= SLIDE 7: SYNTAX RULES QUIZ (RESTRUCTURED INTERACTIVE QUIZ) ================= -->
+        <div id="slide-7" class="slide-panel bg-white">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs uppercase font-extrabold tracking-wider text-alphagen-purple bg-alphagen-purpleGhost px-3.5 py-1.5 rounded-md border border-alphagen-purplePale">Interactive Syntax Quiz</span>
+                    <span id="syntaxQuizBadge" class="text-sm font-bold bg-alphagen-yellow text-alphagen-nearBlack px-3 py-1 rounded-md">Identify All 4 Statements</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-alphagen-nearBlack mb-2">Knowledge</h2>
+                <p class="text-base md:text-lg text-alphagen-darkGrey mb-4">Click each snippet to test if it has valid or invalid Python syntax, and learn why!</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Rule 1 -->
-                <div class="bg-purple-900/60 p-4 rounded-2xl border-2 border-green-400">
-                    <div class="flex items-center gap-2 text-green-400 font-bold mb-2">
-                        <span>✅ CORRECT</span>
+            <div class="grid grid-cols-2 gap-6 my-auto" id="syntaxQuizGrid">
+                <!-- Card 1 -->
+                <div onclick="checkSyntaxRuleCard('rule1', true)" id="syntax-card-rule1" class="btn-interactive bg-alphagen-purpleGhost border-2 border-alphagen-purplePale hover:border-alphagen-purple p-6 rounded-3xl flex flex-col justify-between h-36">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs uppercase font-bold text-alphagen-purple bg-white px-2.5 py-1 rounded-md border border-alphagen-purplePale">Snippet 1</span>
+                        <span id="badge-rule1" class="text-xs font-bold text-alphagen-midGrey"></span>
                     </div>
-                    <div class="code-font text-xs bg-slate-900 p-3 rounded-xl text-yellow-300 mb-2">
+                    <div class="font-mono text-base md:text-lg bg-alphagen-nearBlack text-white p-3 rounded-xl border border-slate-800 font-bold">
                         name = input("Name? ")
                     </div>
-                    <p class="text-xs text-purple-200">Variable box is on the LEFT of <code class="code-font text-white">=</code></p>
                 </div>
 
-                <!-- Rule 2 -->
-                <div class="bg-purple-900/60 p-4 rounded-2xl border-2 border-red-400">
-                    <div class="flex items-center gap-2 text-red-400 font-bold mb-2">
-                        <span>❌ WRONG</span>
+                <!-- Card 2 -->
+                <div onclick="checkSyntaxRuleCard('rule2', false, 'The variable name must ALWAYS be on the left side of = operator! You cannot put input() on the left.')" id="syntax-card-rule2" class="btn-interactive bg-alphagen-purpleGhost border-2 border-alphagen-purplePale hover:border-alphagen-purple p-6 rounded-3xl flex flex-col justify-between h-36">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs uppercase font-bold text-alphagen-purple bg-white px-2.5 py-1 rounded-md border border-alphagen-purplePale">Snippet 2</span>
+                        <span id="badge-rule2" class="text-xs font-bold text-alphagen-midGrey"></span>
                     </div>
-                    <div class="code-font text-xs bg-slate-900 p-3 rounded-xl text-red-300 mb-2">
+                    <div class="font-mono text-base md:text-lg bg-alphagen-nearBlack text-white  p-3 rounded-xl border border-slate-800 font-bold">
                         input("Name? ") = name
                     </div>
-                    <p class="text-xs text-purple-200">Never put <code class="code-font text-white">input()</code> on the left!</p>
                 </div>
 
-                <!-- Rule 3 -->
-                <div class="bg-purple-900/60 p-4 rounded-2xl border-2 border-green-400">
-                    <div class="flex items-center gap-2 text-green-400 font-bold mb-2">
-                        <span>✅ CORRECT</span>
+                <!-- Card 3 -->
+                <div onclick="checkSyntaxRuleCard('rule3', true)" id="syntax-card-rule3" class="btn-interactive bg-alphagen-purpleGhost border-2 border-alphagen-purplePale hover:border-alphagen-purple p-6 rounded-3xl flex flex-col justify-between h-36">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs uppercase font-bold text-alphagen-purple bg-white px-2.5 py-1 rounded-md border border-alphagen-purplePale">Snippet 3</span>
+                        <span id="badge-rule3" class="text-xs font-bold text-alphagen-midGrey"></span>
                     </div>
-                    <div class="code-font text-xs bg-slate-900 p-3 rounded-xl text-yellow-300 mb-2">
+                    <div class="font-mono text-base md:text-lg bg-alphagen-nearBlack text-white  p-3 rounded-xl border border-slate-800 font-bold">
                         age = int(input("Age? "))
                     </div>
-                    <p class="text-xs text-purple-200">Quote marks inside <code class="code-font text-white">""</code> prompt!</p>
                 </div>
 
-                <!-- Rule 4 -->
-                <div class="bg-purple-900/60 p-4 rounded-2xl border-2 border-red-400">
-                    <div class="flex items-center gap-2 text-red-400 font-bold mb-2">
-                        <span>❌ WRONG</span>
+                <!-- Card 4 -->
+                <div onclick="checkSyntaxRuleCard('rule4', false, 'Missing quotation marks around Age?! Without quotes, Python looks for a variable named Age? and throws a NameError.')" id="syntax-card-rule4" class="btn-interactive bg-alphagen-purpleGhost border-2 border-alphagen-purplePale hover:border-alphagen-purple p-6 rounded-3xl flex flex-col justify-between h-36">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs uppercase font-bold text-alphagen-purple bg-white px-2.5 py-1 rounded-md border border-alphagen-purplePale">Snippet 4</span>
+                        <span id="badge-rule4" class="text-xs font-bold text-alphagen-midGrey"></span>
                     </div>
-                    <div class="code-font text-xs bg-slate-900 p-3 rounded-xl text-red-300 mb-2">
+                    <div class="font-mono text-base md:text-lg bg-alphagen-nearBlack text-white  p-3 rounded-xl border border-slate-800 font-bold">
                         age = input(Age?)
                     </div>
-                    <p class="text-xs text-purple-200">Missing quotation marks gives a syntax error!</p>
                 </div>
             </div>
-        </section>
 
-        <!-- SLIDE 8: DETECTIVE BUG HUNT -->
-        <section id="slide-7" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-3">
-                    <span class="text-4xl">🕵️‍♂️</span>
-                    <h2 class="text-2xl md:text-4xl font-black text-yellow-400">Bug Hunt!</h2>
+            <!-- Explanation Feedback Banner -->
+            <div id="syntaxQuizFeedback" class="bg-alphagen-purpleGhost border-2 border-dashed border-alphagen-purple p-4 rounded-2xl text-base md:text-lg text-alphagen-purple font-bold text-center">
+                Click on any of the 4 code snippets above to test if it has valid syntax!
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 8: DETECTIVE BUG HUNT ================= -->
+        <div id="slide-8" class="slide-panel bg-white">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs uppercase font-extrabold tracking-wider text-alphagen-purple bg-alphagen-purpleGhost px-3.5 py-1.5 rounded-md border border-alphagen-purplePale">Knowledge Check</span>
+                    <span id="bugCounter" class="text-sm font-bold bg-alphagen-yellow text-alphagen-nearBlack px-3 py-1 rounded-md">Find 2 Valid Lines</span>
                 </div>
-                <span id="bugCounter" class="text-xs font-black bg-yellow-400 text-purple-950 px-3 py-1 rounded-full">
-                    Find 2 Valid Lines
-                </span>
+                <h2 class="text-3xl md:text-4xl font-bold text-alphagen-nearBlack mb-2">Bug Hunt!</h2>
+                <p class="text-base md:text-lg text-alphagen-darkGrey mb-4">Click on ONLY the 2 correctly formatted code lines below:</p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="bugGrid">
+            <div class="grid grid-cols-2 gap-6 my-auto" id="bugGrid">
                 <!-- Option 1 -->
-                <button onclick="checkBugChoice(this, true)" class="bounce-btn bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 code-font text-xs sm:text-sm text-left flex flex-col justify-between min-h-[90px]">
-                    <div class="text-yellow-300 font-sans font-bold text-xs border-b border-purple-700 pb-1"># Option 1:</div>
-                    <div class="text-white">age = input("Age? ")</div>
-                    <div class="text-right text-xs mt-1"><span class="status-icon">❓</span></div>
+                <button onclick="checkBugChoice(this, true)" class="btn-interactive quiz-option font-mono text-base md:text-lg p-5 text-left flex flex-col justify-between h-28">
+                    <span class="text-alphagen-purple font-sans font-extrabold text-xs uppercase border-b border-alphagen-purplePale pb-1">Line 1:</span>
+                    <span class="text-alphagen-nearBlack font-bold">age = input("Age? ")</span>
+                    <span class="status-icon text-right text-sm">❓</span>
                 </button>
 
                 <!-- Option 2 -->
-                <button onclick="checkBugChoice(this, false, 'Missing quotes around text!')" class="bounce-btn bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 code-font text-xs sm:text-sm text-left flex flex-col justify-between min-h-[90px]">
-                    <div class="text-yellow-300 font-sans font-bold text-xs border-b border-purple-700 pb-1"># Option 2:</div>
-                    <div class="text-white">color = input(Color?)</div>
-                    <div class="text-right text-xs mt-1"><span class="status-icon">❓</span></div>
+                <button onclick="checkBugChoice(this, false, 'Missing quotation marks around prompt text!')" class="btn-interactive quiz-option font-mono text-base md:text-lg p-5 text-left flex flex-col justify-between h-28">
+                    <span class="text-alphagen-purple font-sans font-extrabold text-xs uppercase border-b border-alphagen-purplePale pb-1">Line 2:</span>
+                    <span class="text-alphagen-nearBlack font-bold">color = input(Color?)</span>
+                    <span class="status-icon text-right text-sm">❓</span>
                 </button>
 
                 <!-- Option 3 -->
-                <button onclick="checkBugChoice(this, false, 'No variable name on left to hold input!')" class="bounce-btn bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 code-font text-xs sm:text-sm text-left flex flex-col justify-between min-h-[90px]">
-                    <div class="text-yellow-300 font-sans font-bold text-xs border-b border-purple-700 pb-1"># Option 3:</div>
-                    <div class="text-white">input("Password? ")</div>
-                    <div class="text-right text-xs mt-1"><span class="status-icon">❓</span></div>
+                <button onclick="checkBugChoice(this, false, 'No variable name on left side to store user answer!')" class="btn-interactive quiz-option font-mono text-base md:text-lg p-5 text-left flex flex-col justify-between h-28">
+                    <span class="text-alphagen-purple font-sans font-extrabold text-xs uppercase border-b border-alphagen-purplePale pb-1">Line 3:</span>
+                    <span class="text-alphagen-nearBlack font-bold">input("Password? ")</span>
+                    <span class="status-icon text-right text-sm">❓</span>
                 </button>
 
                 <!-- Option 4 -->
-                <button onclick="checkBugChoice(this, true)" class="bounce-btn bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 code-font text-xs sm:text-sm text-left flex flex-col justify-between min-h-[90px]">
-                    <div class="text-yellow-300 font-sans font-bold text-xs border-b border-purple-700 pb-1"># Option 4:</div>
-                    <div class="text-white">pts = int(input("Pts? "))</div>
-                    <div class="text-right text-xs mt-1"><span class="status-icon">❓</span></div>
+                <button onclick="checkBugChoice(this, true)" class="btn-interactive quiz-option font-mono text-base md:text-lg p-5 text-left flex flex-col justify-between h-28">
+                    <span class="text-alphagen-purple font-sans font-extrabold text-xs uppercase border-b border-alphagen-purplePale pb-1">Line 4:</span>
+                    <span class="text-alphagen-nearBlack font-bold">pts = int(input("Pts? "))</span>
+                    <span class="status-icon text-right text-sm">❓</span>
                 </button>
             </div>
 
-            <div id="bugFeedbackBox" class="mt-4 p-3.5 rounded-2xl hidden text-center font-bold text-sm"></div>
-        </section>
+            <div id="bugFeedbackBox" class="bg-alphagen-purpleGhost border-2 border-dashed border-alphagen-purple p-4 rounded-2xl text-base md:text-lg text-alphagen-purple font-bold text-center">
+                Find both correct Python input statements above!
+            </div>
+        </div>
 
-        <!-- SLIDE 9: SCENARIO QUIZ -->
-        <section id="slide-8" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
-            <div class="flex items-center gap-3 mb-4">
-                <span class="text-4xl">🧩</span>
-                <h2 class="text-2xl md:text-4xl font-black text-yellow-400">Scenario Quiz</h2>
+        <!-- ================= SLIDE 9: SCENARIO QUIZ ================= -->
+        <div id="slide-9" class="slide-panel bg-white">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs uppercase font-extrabold tracking-wider text-alphagen-purple bg-alphagen-purpleGhost px-3.5 py-1.5 rounded-md border border-alphagen-purplePale">Scenario Challenge</span>
+                    <span class="text-sm font-bold text-alphagen-nearBlack bg-alphagen-yellow px-3 py-1 rounded-md">Multiple Choice</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-alphagen-nearBlack mb-2">Scenario Quiz</h2>
+                <p class="text-base md:text-lg font-semibold text-alphagen-darkGrey mb-4">Goal: Get the user's age as a number and add 1 to it. Which option works?</p>
             </div>
 
-            <p class="text-base md:text-lg font-bold text-purple-100 mb-4">
-                Goal: Get user age as a number and add 1.
-            </p>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4" id="scenarioOptions">
-                <!-- Option 1 -->
-                <button onclick="checkScenario(this, false)" class="bounce-btn bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 text-left code-font text-xs sm:text-sm flex flex-col justify-between gap-2 min-h-[90px]">
-                    <div class="text-purple-300 font-sans font-bold text-xs border-b border-purple-700 pb-1">Option A:</div>
-                    <div class="text-white leading-relaxed">
-                        <span class="text-yellow-300">age = input("Age? ")</span><br>
-                        <span class="text-green-300">print(age + 1)</span>
+            <div class="grid grid-cols-2 gap-6 my-auto" id="scenarioOptions">
+                <!-- Option A -->
+                <button onclick="checkScenario(this, false)" class="btn-interactive quiz-option font-mono text-base md:text-lg p-5 text-left flex flex-col justify-between h-28">
+                    <span class="text-alphagen-purple font-sans font-extrabold text-xs uppercase">Option A:</span>
+                    <div>
+                        <span class="text-alphagen-nearBlack font-bold">age = input("Age? ")</span><br>
+                        <span class="text-alphagen-darkGrey">print(age + 1)</span>
                     </div>
                 </button>
 
-                <!-- Option 2 (Correct) -->
-                <button onclick="checkScenario(this, true)" class="bounce-btn bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 text-left code-font text-xs sm:text-sm flex flex-col justify-between gap-2 min-h-[90px]">
-                    <div class="text-purple-300 font-sans font-bold text-xs border-b border-purple-700 pb-1">Option B:</div>
-                    <div class="text-white leading-relaxed">
-                        <span class="text-yellow-300">age = int(input("Age? "))</span><br>
-                        <span class="text-green-300">print(age + 1)</span>
+                <!-- Option B (Correct) -->
+                <button onclick="checkScenario(this, true)" class="btn-interactive quiz-option font-mono text-base md:text-lg p-5 text-left flex flex-col justify-between h-28">
+                    <span class="text-alphagen-purple font-sans font-extrabold text-xs uppercase">Option B:</span>
+                    <div>
+                        <span class="text-alphagen-nearBlack font-bold">age = int(input("Age? "))</span><br>
+                        <span class="text-alphagen-darkGrey">print(age + 1)</span>
                     </div>
                 </button>
 
-                <!-- Option 3 -->
-                <button onclick="checkScenario(this, false)" class="bounce-btn bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 text-left code-font text-xs sm:text-sm flex flex-col justify-between gap-2 min-h-[90px]">
-                    <div class="text-purple-300 font-sans font-bold text-xs border-b border-purple-700 pb-1">Option C:</div>
-                    <div class="text-white leading-relaxed">
-                        <span class="text-yellow-300">age = inpt("Age? ")</span><br>
-                        <span class="text-green-300">print(age + 1)</span>
+                <!-- Option C -->
+                <button onclick="checkScenario(this, false)" class="btn-interactive quiz-option font-mono text-base md:text-lg p-5 text-left flex flex-col justify-between h-28">
+                    <span class="text-alphagen-purple font-sans font-extrabold text-xs uppercase">Option C:</span>
+                    <div>
+                        <span class="text-alphagen-nearBlack font-bold">age = inpt("Age? ")</span><br>
+                        <span class="text-alphagen-darkGrey">print(age + 1)</span>
                     </div>
                 </button>
 
-                <!-- Option 4 -->
-                <button onclick="checkScenario(this, false)" class="bounce-btn bg-purple-900/60 p-4 rounded-2xl border-2 border-purple-700 text-left code-font text-xs sm:text-sm flex flex-col justify-between gap-2 min-h-[90px]">
-                    <div class="text-purple-300 font-sans font-bold text-xs border-b border-purple-700 pb-1">Option D:</div>
-                    <div class="text-white leading-relaxed">
-                        <span class="text-yellow-300">age = print("Age? ")</span><br>
-                        <span class="text-green-300">print(age + 1)</span>
+                <!-- Option D -->
+                <button onclick="checkScenario(this, false)" class="btn-interactive quiz-option font-mono text-base md:text-lg p-5 text-left flex flex-col justify-between h-28">
+                    <span class="text-alphagen-purple font-sans font-extrabold text-xs uppercase">Option D:</span>
+                    <div>
+                        <span class="text-alphagen-nearBlack font-bold">age = print("Age? ")</span><br>
+                        <span class="text-alphagen-darkGrey">print(age + 1)</span>
                     </div>
                 </button>
             </div>
 
-            <div id="scenarioFeedback" class="hidden p-3.5 rounded-2xl text-center font-bold text-sm"></div>
-        </section>
+            <div id="scenarioFeedback" class="bg-alphagen-purpleGhost border-2 border-dashed border-alphagen-purple p-4 rounded-2xl text-base md:text-lg text-alphagen-purple font-bold text-center">
+                Select the correct code block above!
+            </div>
+        </div>
 
-        <!-- SLIDE 10: CODE BUILDER & TERMINAL -->
-        <section id="slide-9" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full">
-            <div class="flex items-center gap-3 mb-3">
-                <span class="text-4xl">💻</span>
-                <h2 class="text-2xl md:text-4xl font-black text-yellow-400">Code Builder</h2>
+        <!-- ================= SLIDE 10: CODE BUILDER & TERMINAL ================= -->
+        <div id="slide-10" class="slide-panel bg-white">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs uppercase font-extrabold tracking-wider text-alphagen-purple bg-alphagen-purpleGhost px-3.5 py-1.5 rounded-md border border-alphagen-purplePale">Code Assembly</span>
+                    <span class="text-sm font-bold text-alphagen-midGrey">Interactive Workspace</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-alphagen-nearBlack mb-2">Code Builder</h2>
+                <p class="text-base md:text-lg text-alphagen-darkGrey mb-3">Click blocks to construct your Python code, then click 'Run Code' to execute:</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+            <div class="grid grid-cols-2 gap-8 items-stretch my-auto">
                 <!-- Left Builder -->
-                <div class="flex flex-col gap-3">
-                    <span class="text-xs font-bold text-yellow-300">1. Click Blocks to add to line:</span>
-                    <div class="flex flex-wrap gap-2" id="blockPalette">
-                        <button onclick="addBlockChip('name')" class="bounce-btn bg-purple-800 text-yellow-300 code-font text-xs px-3 py-2 rounded-lg border border-purple-600 font-bold">name</button>
-                        <button onclick="addBlockChip(' = ')" class="bounce-btn bg-purple-800 text-white code-font text-xs px-3 py-2 rounded-lg border border-purple-600 font-bold">=</button>
-                        <button onclick="addBlockChip('input(')" class="bounce-btn bg-purple-800 text-green-300 code-font text-xs px-3 py-2 rounded-lg border border-purple-600 font-bold">input(</button>
-                        <button onclick="addBlockChip('&quot;Hero Name? &quot;')" class="bounce-btn bg-purple-800 text-amber-300 code-font text-xs px-3 py-2 rounded-lg border border-purple-600 font-bold">"Hero Name? "</button>
-                        <button onclick="addBlockChip(')')" class="bounce-btn bg-purple-800 text-white code-font text-xs px-3 py-2 rounded-lg border border-purple-600 font-bold">)</button>
-                        <button onclick="addBlockChip('print(&quot;Hi &quot; + name)')" class="bounce-btn bg-purple-800 text-cyan-300 code-font text-xs px-3 py-2 rounded-lg border border-purple-600 font-bold w-full text-left">print("Hi " + name)</button>
+                <div class="bg-alphagen-purpleGhost border-2 border-alphagen-purplePale p-5 rounded-3xl flex flex-col justify-between space-y-4">
+                    <div>
+                        <span class="text-xs md:text-sm font-bold text-alphagen-purple uppercase mb-2 block">1. Available Code Blocks:</span>
+                        <div class="flex flex-wrap gap-2.5" id="blockPalette">
+                            <button onclick="addBlockChip('name')" class="btn-interactive bg-white border border-alphagen-purplePale text-alphagen-nearBlack font-mono text-sm px-4 py-2.5 rounded-xl font-bold shadow-xs">name</button>
+                            <button onclick="addBlockChip(' = ')" class="btn-interactive bg-white border border-alphagen-purplePale text-alphagen-nearBlack font-mono text-sm px-4 py-2.5 rounded-xl font-bold shadow-xs">=</button>
+                            <button onclick="addBlockChip('input(')" class="btn-interactive bg-white border border-alphagen-purplePale text-alphagen-purple font-mono text-sm px-4 py-2.5 rounded-xl font-bold shadow-xs">input(</button>
+                            <button onclick="addBlockChip('&quot;Hero Name? &quot;')" class="btn-interactive bg-white border border-alphagen-purplePale text-alphagen-cyanDark font-mono text-sm px-4 py-2.5 rounded-xl font-bold shadow-xs">"Hero Name? "</button>
+                            <button onclick="addBlockChip(')')" class="btn-interactive bg-white border border-alphagen-purplePale text-alphagen-nearBlack font-mono text-sm px-4 py-2.5 rounded-xl font-bold shadow-xs">)</button>
+                            <button onclick="addBlockChip('print(&quot;Hi &quot; + name)')" class="btn-interactive bg-white border border-alphagen-purplePale text-emerald-700 font-mono text-sm px-4 py-2.5 rounded-xl font-bold w-full text-left shadow-xs">print("Hi " + name)</button>
+                        </div>
                     </div>
 
-                    <span class="text-xs font-bold text-yellow-300">2. Code Workspace:</span>
-                    <div class="code-font text-xs bg-slate-900 border-2 border-yellow-400/50 p-3 rounded-xl min-h-[90px] flex flex-wrap items-center gap-1.5 shadow-inner" id="editorDropzone">
-                        <span class="text-slate-500 italic" id="emptyEditorMsg">Tap blocks above to construct code...</span>
+                    <div>
+                        <span class="text-xs md:text-sm font-bold text-alphagen-purple uppercase mb-2 block">2. Code Workspace:</span>
+                        <div class="font-mono text-sm md:text-base bg-alphagen-nearBlack border-2 border-slate-800 p-4 rounded-2xl min-h-[80px] flex flex-wrap items-center gap-2 shadow-inner text-white" id="editorDropzone">
+                            <span class="text-slate-500 italic" id="emptyEditorMsg">Click blocks above to construct code...</span>
+                        </div>
                     </div>
 
-                    <div class="flex gap-2">
-                        <button onclick="runBuiltCode()" class="bounce-btn flex-1 bg-green-400 text-purple-950 font-black py-2.5 rounded-xl text-sm flex items-center justify-center gap-2">
-                            <span>▶ Run Code</span>
+                    <div class="flex gap-4">
+                        <button onclick="runBuiltCode()" class="btn-interactive flex-1 bg-alphagen-yellow hover:bg-alphagen-yellowDark text-alphagen-nearBlack font-bold py-3.5 rounded-2xl text-base shadow-md">
+                            ▶ Run Code
                         </button>
-                        <button onclick="clearEditor()" class="bounce-btn bg-purple-950 text-red-400 font-bold px-4 py-2.5 rounded-xl text-xs border border-red-500/30">
+                        <button onclick="clearEditor()" class="btn-interactive bg-alphagen-coralPale text-alphagen-coralDark font-bold px-5 py-3.5 rounded-2xl text-base border border-alphagen-coral/30">
                             Clear
                         </button>
                     </div>
                 </div>
 
                 <!-- Right Terminal -->
-                <div class="terminal-box rounded-xl p-3 flex flex-col font-mono text-xs min-h-[220px]">
-                    <div class="flex items-center gap-1.5 pb-2 border-b border-slate-700 mb-2">
-                        <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
-                        <div class="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
-                        <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
-                        <span class="text-[10px] text-slate-400 ml-auto">Python Terminal</span>
+                <div class="bg-alphagen-nearBlack border-2 border-slate-800 rounded-3xl p-5 text-white flex flex-col justify-between font-mono text-sm md:text-base min-h-[260px]">
+                    <div class="flex items-center gap-2 pb-3 border-b border-slate-800">
+                        <div class="w-3.5 h-3.5 rounded-full bg-red-500"></div>
+                        <div class="w-3.5 h-3.5 rounded-full bg-yellow-500"></div>
+                        <div class="w-3.5 h-3.5 rounded-full bg-green-500"></div>
+                        <span class="text-slate-400 text-xs ml-auto">Python Terminal</span>
                     </div>
 
-                    <div id="terminalScreen" class="flex-grow overflow-y-auto space-y-2 code-font p-1">
-                        <div class="text-slate-500">Press 'Run Code' to execute.</div>
+                    <div id="terminalScreen" class="flex-grow overflow-y-auto space-y-3 font-mono p-2">
+                        <div class="text-slate-500">Click 'Run Code' to execute.</div>
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- SLIDE 11: CODING CHALLENGE & PREP -->
-        <section id="slide-10" class="slide-container flex-col p-6 md:p-8 rounded-3xl card-dark w-full h-full text-center items-center justify-center">
-            <h2 class="text-4xl md:text-6xl font-black text-yellow-400 mb-4">
-                Coding Challenge 🚀
-            </h2>
+            <div id="builderFeedback" class="bg-alphagen-purpleGhost border-2 border-dashed border-alphagen-purple p-4 rounded-2xl text-base md:text-lg text-alphagen-purple font-bold text-center">
+                Build your code sequence and test it in the terminal!
+            </div>
+        </div>
 
-            <div class="bg-purple-950 p-5 rounded-2xl border-2 border-purple-700 max-w-xl w-full text-left mb-6 space-y-4">
+        <!-- ================= SLIDE 11: CODING CHALLENGE & PREP ================= -->
+        <div id="slide-11" class="slide-panel bg-white">
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs uppercase font-extrabold tracking-wider text-alphagen-purple bg-alphagen-purpleGhost px-3.5 py-1.5 rounded-md border border-alphagen-purplePale">Practice Lab</span>
+                    <span class="text-sm font-bold text-alphagen-nearBlack bg-alphagen-yellow px-3 py-1 rounded-md">IDE Prep Checklist</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-alphagen-nearBlack mb-2">Coding Challenge</h2>
+                <p class="text-base md:text-lg text-alphagen-darkGrey mb-3">Solve these prep questions before testing code in your Python IDE:</p>
+            </div>
+
+            <div class="bg-alphagen-purpleGhost border-2 border-alphagen-purplePale p-7 rounded-3xl my-auto space-y-5">
                 <!-- Q1 -->
                 <div>
-                    <p class="text-xs font-bold text-purple-200 mb-2">1. Get hero name from user:</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="prepQ1Group">
-                        <button onclick="answerPrep(1, true, this)" class="bounce-btn bg-purple-900 p-3 rounded-xl text-xs code-font text-purple-100 text-left border border-purple-700 flex flex-col gap-1">
-                            <span class="text-yellow-300 font-bold font-sans">Option A:</span>
+                    <p class="text-base md:text-lg font-bold text-alphagen-nearBlack mb-3">1. Get hero name from user:</p>
+                    <div class="grid grid-cols-2 gap-4" id="prepQ1Group">
+                        <button onclick="answerPrep(1, true, this)" class="btn-interactive bg-white p-4 rounded-2xl text-sm md:text-base font-mono text-alphagen-nearBlack text-left border border-alphagen-purplePale font-bold">
+                            <span class="text-alphagen-purple font-sans block mb-1">Option A:</span>
                             <span>hero = input("Name? ")</span>
                         </button>
-                        <button onclick="answerPrep(1, false, this)" class="bounce-btn bg-purple-900 p-3 rounded-xl text-xs code-font text-purple-100 text-left border border-purple-700 flex flex-col gap-1">
-                            <span class="text-yellow-300 font-bold font-sans">Option B:</span>
+                        <button onclick="answerPrep(1, false, this)" class="btn-interactive bg-white p-4 rounded-2xl text-sm md:text-base font-mono text-alphagen-nearBlack text-left border border-alphagen-purplePale font-bold">
+                            <span class="text-alphagen-purple font-sans block mb-1">Option B:</span>
                             <span>hero = print("Name? ")</span>
                         </button>
                     </div>
@@ -553,321 +761,333 @@
 
                 <!-- Q2 -->
                 <div>
-                    <p class="text-xs font-bold text-purple-200 mb-2">2. Get power level as integer:</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="prepQ2Group">
-                        <button onclick="answerPrep(2, false, this)" class="bounce-btn bg-purple-900 p-3 rounded-xl text-xs code-font text-purple-100 text-left border border-purple-700 flex flex-col gap-1">
-                            <span class="text-yellow-300 font-bold font-sans">Option A:</span>
+                    <p class="text-base md:text-lg font-bold text-alphagen-nearBlack mb-3">2. Get power level as integer:</p>
+                    <div class="grid grid-cols-2 gap-4" id="prepQ2Group">
+                        <button onclick="answerPrep(2, false, this)" class="btn-interactive bg-white p-4 rounded-2xl text-sm md:text-base font-mono text-alphagen-nearBlack text-left border border-alphagen-purplePale font-bold">
+                            <span class="text-alphagen-purple font-sans block mb-1">Option A:</span>
                             <span>power = input("Power? ")</span>
                         </button>
-                        <button onclick="answerPrep(2, true, this)" class="bounce-btn bg-purple-900 p-3 rounded-xl text-xs code-font text-purple-100 text-left border border-purple-700 flex flex-col gap-1">
-                            <span class="text-yellow-300 font-bold font-sans">Option B:</span>
+                        <button onclick="answerPrep(2, true, this)" class="btn-interactive bg-white p-4 rounded-2xl text-sm md:text-base font-mono text-alphagen-nearBlack text-left border border-alphagen-purplePale font-bold">
+                            <span class="text-alphagen-purple font-sans block mb-1">Option B:</span>
                             <span>power = int(input("Power? "))</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Victory Banner -->
-            <div id="finalBanner" class="hidden bg-gradient-to-r from-green-400 to-emerald-500 text-purple-950 p-5 rounded-2xl font-black text-xl md:text-2xl shadow-2xl border-2 border-white animate-bounce">
-                You are completely ready to write your first code! 🚀✨
+            <div id="finalBanner" class="bg-emerald-50 border-2 border-emerald-400 p-4 rounded-2xl text-base md:text-lg text-emerald-950 font-bold text-center">
+                Answer both prep questions above to finish the lesson!
             </div>
-        </section>
+        </div>
 
-    </main>
+    </div>
 
-    <!-- FOOTER NAVIGATION -->
-    <footer class="w-full max-w-6xl mx-auto flex items-center justify-between gap-4 p-3.5 rounded-2xl card-dark z-20 mt-3">
-        <button id="prevBtn" onclick="prevSlide()" class="bounce-btn bg-purple-900 hover:bg-purple-800 text-yellow-300 font-bold px-5 py-2.5 rounded-xl border border-purple-700 flex items-center gap-2 text-sm disabled:opacity-40">
-            <span>⬅️ Back</span>
+    <!-- Bottom Fixed Navigation Control Bar -->
+    <div class="nav-bar">
+        <button id="prev-btn" class="nav-btn btn-interactive" onclick="prevSlide()" disabled>
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Previous</span>
         </button>
 
-        <button id="nextBtn" onclick="nextSlide()" class="bounce-btn bg-yellow-400 hover:bg-yellow-300 text-purple-950 font-black px-7 py-2.5 rounded-xl shadow-lg flex items-center gap-2 text-sm disabled:opacity-40">
-            <span>Next ➡️</span>
+        <span class="text-sm font-semibold text-white">
+            Use Arrow Keys to navigate slides
+        </span>
+
+        <button id="next-btn" class="nav-btn btn-interactive" onclick="nextSlide()">
+            <span>Next</span>
+            <i class="fa-solid fa-arrow-right"></i>
         </button>
-    </footer>
+    </div>
 
     <script>
-        /* WEB AUDIO SYNTHESIZER */
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        let audioCtx = null;
-
-        function initAudio() {
-            if (!audioCtx) audioCtx = new AudioContext();
-        }
-
-        function playClickSound() {
-            try {
-                initAudio();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(450, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(850, audioCtx.currentTime + 0.06);
-                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.06);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.06);
-            } catch(e){}
-        }
-
-        function playCorrectSound() {
-            try {
-                initAudio();
-                const now = audioCtx.currentTime;
-                [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'triangle';
-                    osc.frequency.value = freq;
-                    gain.gain.setValueAtTime(0.18, now + idx * 0.07);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.18);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start(now + idx * 0.07);
-                    osc.stop(now + idx * 0.07 + 0.18);
-                });
-            } catch(e){}
-        }
-
-        function playWrongSound() {
-            try {
-                initAudio();
-                const now = audioCtx.currentTime;
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, now);
-                osc.frequency.linearRampToValueAtTime(100, now + 0.2);
-                gain.gain.setValueAtTime(0.18, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(now);
-                osc.stop(now + 0.2);
-            } catch(e){}
-        }
-
-        /* SLIDE CONTROLLER */
+        let currentSlide = 1;
         const totalSlides = 11;
-        let currentSlide = 0;
+        let soundEnabled = true;
 
-        const slideTitles = [
-            "1. Start", "2. Ice Cream Shop", "3. Robo Ear",
-            "4. Data Flow", "5. Input/Output", "6. Text Trap",
-            "7. Syntax Rules", "8. Bug Hunt", "9. Quiz",
-            "10. Code Builder", "11. Final Challenge"
-        ];
+        /* Web Audio Synthesizer */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        function initDropdown() {
-            const select = document.getElementById('slideSelect');
-            select.innerHTML = '';
-            slideTitles.forEach((title, idx) => {
-                const opt = document.createElement('option');
-                opt.value = idx;
-                opt.innerText = title;
-                select.appendChild(opt);
-            });
+        function toggleAudio() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('audio-btn');
+            btn.innerHTML = soundEnabled ? '<i class="fa-solid fa-volume-high"></i>' : '<i class="fa-solid fa-volume-xmark"></i>';
         }
 
-        function updateDeckUI() {
-            for (let i = 0; i < totalSlides; i++) {
-                const slide = document.getElementById(`slide-${i}`);
-                if (slide) slide.classList.remove('active');
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(659.25, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'pop') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(360, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(720, audioCtx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.08);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(110, audioCtx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+                }
+            } catch (e) {}
+        }
+
+        function initHeaderDots() {
+            const container = document.getElementById('header-dots-container');
+            container.innerHTML = '';
+            for (let i = 1; i <= totalSlides; i++) {
+                const dot = document.createElement('div');
+                dot.className = `dot-indicator ${i === 1 ? 'active' : ''}`;
+                dot.onclick = () => goToSlide(i);
+                container.appendChild(dot);
             }
-
-            const activeSlide = document.getElementById(`slide-${currentSlide}`);
-            if (activeSlide) activeSlide.classList.add('active');
-
-            document.getElementById('slideIndicator').innerText = `${currentSlide + 1} / ${totalSlides}`;
-            document.getElementById('slideSelect').value = currentSlide;
-
-            const progressPct = ((currentSlide + 1) / totalSlides) * 100;
-            document.getElementById('deckProgressBar').style.width = `${progressPct}%`;
-
-            document.getElementById('prevBtn').disabled = (currentSlide === 0);
-            document.getElementById('nextBtn').disabled = (currentSlide === totalSlides - 1);
         }
 
-        function goToSlide(index) {
-            if (index >= 0 && index < totalSlides) {
-                currentSlide = index;
-                playClickSound();
-                updateDeckUI();
+        function updateSlideDisplay() {
+            document.querySelectorAll('.slide-panel').forEach((panel, idx) => {
+                panel.classList.remove('active');
+                if (idx + 1 === currentSlide) {
+                    panel.classList.add('active');
+                }
+            });
+
+            const dots = document.querySelectorAll('.dot-indicator');
+            dots.forEach((dot, idx) => {
+                if (idx + 1 === currentSlide) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+
+            document.getElementById('slide-counter-pill').innerText = `Slide ${currentSlide} / ${totalSlides}`;
+            document.getElementById('slide-dropdown').value = currentSlide;
+
+            document.getElementById('prev-btn').disabled = currentSlide === 1;
+            document.getElementById('next-btn').disabled = currentSlide === totalSlides;
+        }
+
+        function goToSlide(slideNum) {
+            if (slideNum >= 1 && slideNum <= totalSlides) {
+                currentSlide = slideNum;
+                playSound('pop');
+                updateSlideDisplay();
             }
         }
 
         function nextSlide() {
-            if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1);
+            if (currentSlide < totalSlides) goToSlide(currentSlide + 1);
         }
 
         function prevSlide() {
-            if (currentSlide > 0) goToSlide(currentSlide - 1);
+            if (currentSlide > 1) goToSlide(currentSlide - 1);
         }
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight') nextSlide();
-            if (e.key === 'ArrowLeft') prevSlide();
-        });
-
-        /* SLIDE INTERACTION LOGIC */
+        /* Slide 2 Ice Cream Shop Logic */
         function checkQuizS2(btn, isCorrect) {
-            const buttons = document.querySelectorAll('#quiz-s2 button');
-            buttons.forEach(b => b.classList.remove('border-green-400', 'border-red-400', 'bg-green-500/20', 'bg-red-500/20'));
+            document.querySelectorAll('#quiz-s2 .quiz-option').forEach(b => b.classList.remove('selected-correct', 'selected-wrong'));
+            const feedback = document.getElementById('quiz-s2-feedback');
 
             if (isCorrect) {
-                playCorrectSound();
-                btn.classList.add('border-green-400', 'bg-green-500/20');
-                document.getElementById('quiz-s2-feedback').classList.remove('hidden');
-                confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+                playSound('correct');
+                btn.classList.add('selected-correct');
+                feedback.innerText = "Exactly! input() pauses Python execution and waits for your response!";
+                triggerConfetti();
             } else {
-                playWrongSound();
-                btn.classList.add('border-red-400', 'bg-red-500/20');
+                playSound('wrong');
+                btn.classList.add('selected-wrong');
+                feedback.innerText = "Not quite! Think about how a person pauses and waits for your answer.";
             }
         }
 
+        /* Slide 3 Robo Ear Simulator Logic */
         function runRoboSim() {
             const text = document.getElementById('roboInput').value.trim();
             const avatar = document.getElementById('roboAvatar');
             const bubble = document.getElementById('roboSpeechBubble');
 
             if (!text) {
-                playWrongSound();
-                bubble.innerText = "Type something first! 🚨";
+                playSound('wrong');
+                bubble.innerText = "Type a food name first!";
                 return;
             }
 
-            playCorrectSound();
-            avatar.style.transform = "scale(1.2) rotate(10deg)";
+            playSound('correct');
+            avatar.style.transform = "scale(1.15) rotate(5deg)";
             setTimeout(() => avatar.style.transform = "scale(1) rotate(0deg)", 300);
 
-            bubble.innerText = `food = "${text}" 🍕`;
+            bubble.innerText = `food = "${text}"`;
         }
 
+        /* Slide 4 Data Flow Reveal */
         function revealStep(stepNum) {
-            playClickSound();
+            playSound('pop');
             const detail = document.getElementById(`stepDetail${stepNum}`);
             detail.classList.toggle('hidden');
         }
 
+        /* Slide 5 Concept Classifier */
         let classifiedCount = 0;
         function classifyItem(id, choice, isCorrect) {
             const container = document.getElementById(`item-${id}`);
             if (container.dataset.completed) return;
 
             if (isCorrect) {
-                playCorrectSound();
-                container.classList.remove('border-purple-700');
-                container.classList.add('border-green-400', 'bg-green-500/10');
+                playSound('correct');
+                container.className = "bg-emerald-50 border-2 border-emerald-400 p-6 rounded-3xl flex flex-col justify-between";
                 container.dataset.completed = "true";
                 classifiedCount++;
-                document.getElementById('sortProgressText').innerText = `${classifiedCount} / 4`;
+                document.getElementById('sortProgressText').innerText = `${classifiedCount} / 4 Sorted`;
 
                 if (classifiedCount === 4) {
-                    confetti({ particleCount: 80, spread: 80, origin: { y: 0.6 } });
+                    triggerConfetti();
                 }
             } else {
-                playWrongSound();
-                container.classList.add('border-red-400', 'bg-red-500/10');
-                setTimeout(() => container.classList.remove('border-red-400', 'bg-red-500/10'), 800);
+                playSound('wrong');
+                container.className = "bg-alphagen-coralPale border-2 border-alphagen-coral p-6 rounded-3xl flex flex-col justify-between";
+                setTimeout(() => {
+                    container.className = "bg-alphagen-purpleGhost border-2 border-alphagen-purplePale p-6 rounded-3xl flex flex-col justify-between";
+                }, 800);
             }
         }
 
+        /* Slide 6 Calc Mode Toggle */
         function setCalcMode(mode) {
-            playClickSound();
+            playSound('pop');
             const normalBtn = document.getElementById('modeNormalBtn');
             const intBtn = document.getElementById('modeIntBtn');
             const result = document.getElementById('calcResultDisplay');
 
             if (mode === 'normal') {
-                normalBtn.className = "flex-1 bg-yellow-400 text-purple-950 font-black py-2.5 rounded-xl text-xs sm:text-sm";
-                intBtn.className = "flex-1 bg-purple-800 text-purple-200 font-black py-2.5 rounded-xl text-xs sm:text-sm";
-                result.innerText = '"5" + "5" = "55" ❌';
-                result.className = "text-4xl md:text-5xl font-black text-red-400 code-font";
+                normalBtn.className = "btn-interactive flex-1 bg-alphagen-purple text-white font-extrabold py-4 rounded-2xl text-base md:text-lg shadow-md";
+                intBtn.className = "btn-interactive flex-1 bg-white border border-alphagen-purplePale text-alphagen-nearBlack font-extrabold py-4 rounded-2xl text-base md:text-lg";
+                result.innerText = '"5" + "5" = "55"';
+                result.className = "text-5xl md:text-6xl font-extrabold text-alphagen-coral font-mono";
             } else {
-                intBtn.className = "flex-1 bg-yellow-400 text-purple-950 font-black py-2.5 rounded-xl text-xs sm:text-sm";
-                normalBtn.className = "flex-1 bg-purple-800 text-purple-200 font-black py-2.5 rounded-xl text-xs sm:text-sm";
-                result.innerText = '5 + 5 = 10 ✅';
-                result.className = "text-4xl md:text-5xl font-black text-green-400 code-font";
-                confetti({ particleCount: 40, spread: 50, origin: { y: 0.6 } });
+                intBtn.className = "btn-interactive flex-1 bg-alphagen-purple text-white font-extrabold py-4 rounded-2xl text-base md:text-lg shadow-md";
+                normalBtn.className = "btn-interactive flex-1 bg-white border border-alphagen-purplePale text-alphagen-nearBlack font-extrabold py-4 rounded-2xl text-base md:text-lg";
+                result.innerText = "5 + 5 = 10";
+                result.className = "text-5xl md:text-6xl font-extrabold text-emerald-400 font-mono";
+                triggerConfetti();
             }
         }
 
+        /* Slide 7 Interactive Syntax Rules Quiz Logic */
+        let checkedSyntaxCount = 0;
+        const checkedSyntaxSet = new Set();
+
+        function checkSyntaxRuleCard(ruleId, isCorrect, errorMsg = '') {
+            const card = document.getElementById(`syntax-card-${ruleId}`);
+            const badge = document.getElementById(`badge-${ruleId}`);
+            const feedback = document.getElementById('syntaxQuizFeedback');
+
+            if (isCorrect) {
+                playSound('correct');
+                card.className = "btn-interactive bg-emerald-50 border-2 border-emerald-500 p-6 rounded-3xl flex flex-col justify-between h-36";
+                badge.innerHTML = "<span class='text-emerald-700 font-extrabold'>✅ VALID SYNTAX!</span>";
+                feedback.innerText = "VALID SYNTAX: Variable box is on the left, input() function is on the right, and strings are enclosed in quotes!";
+            } else {
+                playSound('wrong');
+                card.className = "btn-interactive bg-alphagen-coralPale border-2 border-alphagen-coral p-6 rounded-3xl flex flex-col justify-between h-36";
+                badge.innerHTML = "<span class='text-alphagen-coralDark font-extrabold'>❌ INVALID SYNTAX</span>";
+                feedback.innerText = `INVALID SYNTAX: ${errorMsg}`;
+            }
+
+            checkedSyntaxSet.add(ruleId);
+            if (checkedSyntaxSet.size === 4) {
+                triggerConfetti();
+                document.getElementById('syntaxQuizBadge').innerText = "All Snippets Examined!";
+            }
+        }
+
+        /* Slide 8 Bug Detective */
         let foundBugs = 0;
         function checkBugChoice(btn, isCorrect, msg = '') {
             const icon = btn.querySelector('.status-icon');
             const feedback = document.getElementById('bugFeedbackBox');
 
             if (isCorrect) {
-                playCorrectSound();
-                btn.className = "bg-green-500/20 p-4 rounded-2xl border-2 border-green-400 code-font text-xs sm:text-sm text-green-300 flex flex-col justify-between min-h-[90px] pointer-events-none";
+                playSound('correct');
+                btn.className = "btn-interactive quiz-option selected-correct font-mono text-base md:text-lg p-5 text-left flex flex-col justify-between h-28 pointer-events-none";
                 icon.innerText = "✅";
                 foundBugs++;
-                feedback.innerText = "Correct! Valid Python line!";
-                feedback.className = "mt-4 p-3.5 rounded-2xl text-center font-bold text-sm bg-green-500/20 text-green-300 border border-green-400 block";
+                feedback.innerText = "Correct! Valid Python statement!";
 
                 if (foundBugs === 2) {
-                    confetti({ particleCount: 100, spread: 100, origin: { y: 0.6 } });
-                    document.getElementById('bugCounter').innerText = "Clear! 🎉";
+                    triggerConfetti();
+                    document.getElementById('bugCounter').innerText = "All Bugs Found!";
                 }
             } else {
-                playWrongSound();
-                btn.className = "bg-red-500/20 p-4 rounded-2xl border-2 border-red-400 code-font text-xs sm:text-sm text-red-300 flex flex-col justify-between min-h-[90px]";
+                playSound('wrong');
+                btn.className = "btn-interactive quiz-option selected-wrong font-mono text-base md:text-lg p-5 text-left flex flex-col justify-between h-28";
                 icon.innerText = "❌";
-                feedback.innerText = `Bug! ${msg}`;
-                feedback.className = "mt-4 p-3.5 rounded-2xl text-center font-bold text-sm bg-red-500/20 text-red-300 border border-red-400 block";
+                feedback.innerText = `Bug Detected: ${msg}`;
             }
         }
 
+        /* Slide 9 Scenario Quiz */
         function checkScenario(btn, isCorrect) {
-            const buttons = document.querySelectorAll('#scenarioOptions button');
-            buttons.forEach(b => b.classList.remove('border-green-400', 'border-red-400', 'bg-green-500/20', 'bg-red-500/20'));
-
+            document.querySelectorAll('#scenarioOptions button').forEach(b => b.classList.remove('selected-correct', 'selected-wrong'));
             const feedback = document.getElementById('scenarioFeedback');
 
             if (isCorrect) {
-                playCorrectSound();
-                btn.classList.add('border-green-400', 'bg-green-500/20');
-                feedback.innerText = "🎯 Correct! int() converts the text to a number so + 1 does math!";
-                feedback.className = "p-3.5 rounded-2xl text-center font-bold text-sm bg-green-500/20 text-green-300 border border-green-400 block";
-                confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+                playSound('correct');
+                btn.classList.add('selected-correct');
+                feedback.innerText = "Correct! int() converts the string to a number so + 1 does math!";
+                triggerConfetti();
             } else {
-                playWrongSound();
-                btn.classList.add('border-red-400', 'bg-red-500/20');
-                feedback.innerText = "❌ Oops! Remember: input() gives text. You need int() to add numbers!";
-                feedback.className = "p-3.5 rounded-2xl text-center font-bold text-sm bg-red-500/20 text-red-300 border border-red-400 block";
+                playSound('wrong');
+                btn.classList.add('selected-wrong');
+                feedback.innerText = "Not quite! Remember: input() returns text, so int() is needed for calculations.";
             }
         }
 
+        /* Slide 10 Code Builder & Terminal */
         let codeTokens = [];
 
         function addBlockChip(token) {
-            playClickSound();
+            playSound('pop');
             codeTokens.push(token);
             renderEditor();
         }
 
         function clearEditor() {
-            playClickSound();
+            playSound('pop');
             codeTokens = [];
             renderEditor();
-            document.getElementById('terminalScreen').innerHTML = '<div class="text-slate-500">Console cleared.</div>';
+            document.getElementById('terminalScreen').innerHTML = '<div class="text-slate-500">Terminal cleared.</div>';
         }
 
         function renderEditor() {
             const dropzone = document.getElementById('editorDropzone');
             if (codeTokens.length === 0) {
-                dropzone.innerHTML = '<span class="text-slate-500 italic" id="emptyEditorMsg">Tap blocks above to construct code...</span>';
+                dropzone.innerHTML = '<span class="text-slate-500 italic" id="emptyEditorMsg">Click blocks above to construct code...</span>';
                 return;
             }
             dropzone.innerHTML = '';
             codeTokens.forEach((token, idx) => {
                 const chip = document.createElement('span');
-                chip.className = 'bg-purple-800 text-yellow-300 px-2.5 py-1 rounded-md border border-purple-600 font-mono font-bold text-xs inline-flex items-center gap-1 cursor-pointer hover:bg-purple-700';
+                chip.className = 'bg-alphagen-purple text-white px-3 py-1.5 rounded-lg font-mono font-bold text-sm inline-flex items-center gap-1 cursor-pointer hover:bg-alphagen-purpleDark';
                 chip.innerText = token;
                 chip.onclick = () => {
-                    playClickSound();
+                    playSound('pop');
                     codeTokens.splice(idx, 1);
                     renderEditor();
                 };
@@ -880,25 +1100,25 @@
             const constructedCode = codeTokens.join('');
 
             if (codeTokens.length === 0) {
-                playWrongSound();
-                terminal.innerHTML = '<div class="text-red-400">Workspace is empty! Add blocks first.</div>';
+                playSound('wrong');
+                terminal.innerHTML = '<div class="text-alphagen-coral font-bold">Workspace is empty! Click blocks first.</div>';
                 return;
             }
 
-            playCorrectSound();
-            terminal.innerHTML = `<div class="text-yellow-400">$ python script.py</div>`;
-            terminal.innerHTML += `<div class="text-slate-300 code-font">${constructedCode}</div>`;
+            playSound('correct');
+            terminal.innerHTML = `<div class="text-alphagen-yellow font-bold">$ python main.py</div>`;
+            terminal.innerHTML += `<div class="text-slate-300 font-mono">${constructedCode}</div>`;
 
             if (constructedCode.includes('input')) {
                 terminal.innerHTML += `
-                    <div class="mt-2 text-purple-300 flex flex-col gap-1">
-                        <label for="termInput" class="text-yellow-300 font-bold">Hero Name? </label>
+                    <div class="mt-3 text-slate-300 flex flex-col gap-2">
+                        <label for="termInput" class="text-alphagen-yellow font-bold">Hero Name? </label>
                         <div class="flex gap-2">
-                            <input type="text" id="termInput" placeholder="Type here & press Enter..." class="bg-slate-900 border border-yellow-400 px-2 py-1 text-green-300 font-mono text-xs rounded outline-none flex-1" />
-                            <button onclick="submitTerminalInput()" class="bg-yellow-400 text-purple-950 font-bold px-3 py-1 rounded text-xs hover:bg-yellow-300">Enter ↵</button>
+                            <input type="text" id="termInput" placeholder="Type name..." class="bg-slate-900 border border-slate-700 px-3 py-1.5 text-emerald-400 font-mono text-sm rounded-xl outline-none flex-1 focus:border-alphagen-purple" />
+                            <button onclick="submitTerminalInput()" class="bg-alphagen-yellow text-alphagen-nearBlack font-bold px-4 py-1.5 rounded-xl text-sm hover:bg-alphagen-yellowDark">Submit</button>
                         </div>
                     </div>
-                    <div id="termOutput" class="mt-2 text-cyan-300"></div>
+                    <div id="termOutput" class="mt-2 text-alphagen-cyan font-bold"></div>
                 `;
                 setTimeout(() => {
                     const inputEl = document.getElementById('termInput');
@@ -910,10 +1130,10 @@
                     }
                 }, 100);
             } else if (constructedCode.includes('print')) {
-                terminal.innerHTML += `<div class="text-cyan-300 mt-2">Hi Flash</div>`;
-                confetti({ particleCount: 40, spread: 50, origin: { y: 0.6 } });
+                terminal.innerHTML += `<div class="text-emerald-400 font-bold mt-2">Hi Alex</div>`;
+                triggerConfetti();
             } else {
-                terminal.innerHTML += `<div class="text-slate-400 mt-2">(Code executed successfully with no output)</div>`;
+                terminal.innerHTML += `<div class="text-slate-400 mt-2">(Code executed successfully)</div>`;
             }
         }
 
@@ -923,46 +1143,66 @@
             if (!inputEl) return;
 
             const val = inputEl.value.trim() || 'Hero';
-            playCorrectSound();
+            playSound('correct');
 
             const constructedCode = codeTokens.join('');
             if (constructedCode.includes('print')) {
-                outputEl.innerHTML = `<span class="text-green-400">>>> Hi ${val}! 🚀</span>`;
+                outputEl.innerHTML = `<span class="text-emerald-400">Hi ${val}</span>`;
             } else {
-                outputEl.innerHTML = `<span class="text-green-400">>>> Stored variable: name = "${val}"</span>`;
+                outputEl.innerHTML = `<span class="text-emerald-400">Stored variable: name = "${val}"</span>`;
             }
 
             inputEl.disabled = true;
-            confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+            triggerConfetti();
         }
 
+        /* Slide 11 Prep Questions */
         let prepAnswers = { 1: false, 2: false };
         function answerPrep(qNum, isCorrect, btn) {
             const parent = document.getElementById(`prepQ${qNum}Group`);
             parent.querySelectorAll('button').forEach(b => {
-                b.classList.remove('bg-green-500', 'bg-red-500', 'text-purple-950', 'text-white');
+                b.classList.remove('bg-emerald-500', 'text-white', 'bg-alphagen-coral', 'text-white');
             });
 
             if (isCorrect) {
-                playCorrectSound();
-                btn.classList.add('bg-green-500', 'text-purple-950');
+                playSound('correct');
+                btn.className = "btn-interactive bg-emerald-50 border-2 border-emerald-500 p-4 rounded-2xl text-sm md:text-base font-mono text-emerald-950 text-left font-bold";
                 prepAnswers[qNum] = true;
             } else {
-                playWrongSound();
-                btn.classList.add('bg-red-500', 'text-white');
+                playSound('wrong');
+                btn.className = "btn-interactive bg-alphagen-coralPale border-2 border-alphagen-coral p-4 rounded-2xl text-sm md:text-base font-mono text-alphagen-coralDark text-left font-bold";
                 prepAnswers[qNum] = false;
             }
 
             if (prepAnswers[1] && prepAnswers[2]) {
-                document.getElementById('finalBanner').classList.remove('hidden');
-                confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 } });
+                const banner = document.getElementById('finalBanner');
+                banner.innerText = "All Prep Questions Passed! You are ready to code in your Python editor!";
+                banner.className = "bg-emerald-50 border-2 border-emerald-400 p-4 rounded-2xl text-base md:text-lg text-emerald-950 font-bold text-center";
+                triggerConfetti();
             }
         }
 
-        window.onload = function() {
-            initDropdown();
-            updateDeckUI();
-        };
+        /* Confetti Animation */
+        function triggerConfetti() {
+            playSound('correct');
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+        }
+
+        /* Keyboard Listener */
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') {
+                return;
+            }
+            if (e.key === 'ArrowRight' || e.key === 'Space') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initHeaderDots();
+            updateSlideDisplay();
+        });
     </script>
 </body>
 </html>
